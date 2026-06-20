@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>高一物理学习小助手</title>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#6c5ce7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="物理助手">
+<link rel="apple-touch-icon" href="icons/icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192x192.png">
+<style>
+/* ===== Neumorphism Design System ===== */
+:root {
+  --bg: #e8ecf1; --bg-press: #d6dbe2;
+  --shadow-dark: #bcc3cc; --shadow-light: #ffffff;
+  --shadow-dark-sm: #ccd3da; --shadow-light-sm: #f8fafc;
+  --text: #2d3436; --text-secondary: #636e72; --text-tertiary: #b2bec3;
+  --accent: #6c5ce7; --accent-light: rgba(108,92,231,0.12);
+  --green: #00b894; --green-bg: #d4f5ed;
+  --red: #d63031; --red-bg: #fce4e4;
+  --orange: #e17055; --orange-bg: #fce8e3;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SF Mono", "Cascadia Code", "Consolas", ui-monospace;
+  --r-sm: 14px; --r-md: 20px; --r-lg: 28px; --r-xl: 36px;
+  --raise-sm: 3px 3px 7px var(--shadow-dark), -3px -3px 7px var(--shadow-light);
+  --raise-md: 6px 6px 14px var(--shadow-dark), -6px -6px 14px var(--shadow-light);
+  --raise-lg: 9px 9px 20px var(--shadow-dark), -9px -9px 20px var(--shadow-light);
+  --inset-sm: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);
+  --inset-md: inset 4px 4px 10px var(--shadow-dark), inset -4px -4px 10px var(--shadow-light);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body {
+  font-family: var(--font); background: var(--bg);
+  color: var(--text); min-height: 100vh; line-height: 1.5; overflow-x: hidden;
+}
+
+#app-container { max-width: 430px; margin: 0 auto; min-height: 100vh; padding: 0 18px 110px; position: relative; z-index: 1; }
+
+.screen { display: none; padding-top: 16px; }
+.screen.active { display: block; animation: fadeSlide 0.3s ease; }
+@keyframes fadeSlide { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ===== Nav Bar ===== */
+.top-bar { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; margin-bottom: 12px; }
+.top-bar-back {
+  width: 38px; height: 38px; border-radius: var(--r-sm); cursor: pointer;
+  background: var(--bg); box-shadow: var(--raise-sm);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-size: 18px; font-weight: 600;
+  transition: all 0.15s ease; border: none;
+}
+.top-bar-back:active { box-shadow: var(--inset-sm); transform: scale(0.96); }
+.top-bar-title { font-size: 18px; font-weight: 700; letter-spacing: -0.01em; }
+
+/* ===== Bottom Tab Bar ===== */
+#bottom-nav {
+  position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  width: calc(100% - 36px); max-width: 394px; z-index: 100;
+  display: flex; justify-content: space-around; align-items: center;
+  background: var(--bg); box-shadow: var(--raise-lg);
+  border-radius: var(--r-xl); padding: 8px 6px 12px;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: none; border: none; color: var(--text-tertiary); cursor: pointer;
+  font-size: 10px; font-family: var(--font); font-weight: 600;
+  padding: 5px 10px; border-radius: var(--r-md);
+  transition: all 0.2s ease; min-width: 48px;
+}
+.nav-item .nav-icon { font-size: 20px; line-height: 1; transition: transform 0.2s ease; }
+.nav-item.active { color: var(--accent); box-shadow: var(--inset-sm); }
+
+/* ===== Cards ===== */
+.card {
+  background: var(--bg); border-radius: var(--r-lg);
+  padding: 20px; margin-bottom: 14px;
+  box-shadow: var(--raise-md);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+/* ===== Buttons ===== */
+.btn-primary, .btn-secondary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 14px 28px; border-radius: var(--r-md); font-size: 15px;
+  font-weight: 700; font-family: var(--font); cursor: pointer;
+  border: none; background: var(--bg);
+  box-shadow: var(--raise-sm); color: var(--text);
+  transition: all 0.15s ease; letter-spacing: -0.01em;
+}
+.btn-primary:active, .btn-secondary:active { box-shadow: var(--inset-sm); transform: scale(0.97); }
+.btn-primary { background: var(--accent); color: #fff; box-shadow: 4px 4px 10px rgba(108,92,231,0.25), -4px -4px 10px rgba(255,255,255,0.5); }
+.btn-primary:active { box-shadow: inset 3px 3px 7px rgba(0,0,0,0.2), inset -3px -3px 7px rgba(255,255,255,0.2); }
+.btn-secondary { display: block; width: 100%; padding: 14px; text-align: center; }
+.btn-sm {
+  padding: 7px 16px; font-size: 13px; border-radius: var(--r-sm); font-weight: 700;
+  background: var(--bg); box-shadow: var(--raise-sm); border: none;
+  font-family: var(--font); cursor: pointer; color: var(--text);
+  transition: all 0.15s ease;
+}
+.btn-sm:active { box-shadow: var(--inset-sm); transform: scale(0.96); }
+.btn-buy { color: var(--accent); }
+.btn-danger { background: var(--red-bg); color: var(--red); box-shadow: var(--inset-sm); }
+.btn-danger:hover { box-shadow: 3px 3px 7px rgba(214,48,49,0.15), -3px -3px 7px #fff; }
+
+/* ===== Dashboard ===== */
+.dash-header { display: flex; align-items: center; gap: 16px; margin-bottom: 24px; }
+.avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--bg); box-shadow: var(--raise-md);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-size: 22px; font-weight: 700;
+}
+.dash-level-badge {
+  display: inline-flex; padding: 4px 14px; border-radius: var(--r-sm);
+  background: var(--bg); box-shadow: var(--inset-sm);
+  font-size: 12px; font-weight: 700; color: var(--accent);
+}
+.xp-bar-wrap { flex: 1; height: 10px; border-radius: 5px; margin-top: 8px; background: var(--bg); box-shadow: var(--inset-sm); overflow: hidden; }
+.xp-bar-fill { height: 100%; border-radius: 5px; background: linear-gradient(90deg, #a29bfe, var(--accent)); box-shadow: 0 1px 3px rgba(108,92,231,0.3); transition: width 0.5s ease; }
+.stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+.stat-card { background: var(--bg); border-radius: var(--r-lg); padding: 18px 12px; text-align: center; box-shadow: var(--raise-md); }
+.stat-card .stat-value { font-size: 24px; font-weight: 800; font-family: var(--font-mono); }
+.stat-card .stat-label { font-size: 11px; color: var(--text-secondary); margin-top: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-card.coin .stat-value { color: var(--orange); }
+.stat-card.streak .stat-value { color: var(--accent); }
+.stat-card.badge .stat-value { color: var(--green); }
+.section-title { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin: 22px 0 10px; }
+.knowledge-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.kp-mini-card {
+  background: var(--bg); border-radius: var(--r-md); padding: 14px 16px;
+  cursor: pointer; box-shadow: var(--raise-sm);
+  display: flex; align-items: center; gap: 10px;
+  font-size: 14px; font-weight: 600; transition: all 0.2s ease;
+}
+.kp-mini-card:active { box-shadow: var(--inset-sm); }
+.kp-mini-card .kp-status { width: 12px; height: 12px; border-radius: 50%; display: inline-block; margin-right: 0; }
+.kp-mini-card .kp-status.mastered { background: var(--green); box-shadow: 0 0 8px rgba(0,184,148,0.35); }
+.kp-mini-card .kp-status.weak { background: var(--red); box-shadow: 0 0 8px rgba(214,48,49,0.35); }
+.kp-mini-card .kp-status.progress { background: var(--orange); box-shadow: 0 0 8px rgba(225,112,85,0.35); }
+.kp-mini-card .kp-status.locked { background: #c8cdd4; }
+
+/* ===== Star Map ===== */
+#star-map-wrap { width: 100%; aspect-ratio: 1; max-height: 55vh; border-radius: var(--r-xl); overflow: hidden; box-shadow: var(--inset-md); margin-bottom: 16px; }
+#star-map { width: 100%; height: 100%; display: block; }
+
+/* ===== Question ===== */
+.question-card { background: var(--bg); border-radius: var(--r-xl); padding: 24px 22px; margin-bottom: 14px; box-shadow: var(--raise-md); }
+.question-stem { font-size: 16px; line-height: 1.6; margin-bottom: 20px; font-weight: 550; }
+.question-timer { font-size: 14px; color: var(--text-tertiary); font-family: var(--font-mono); font-weight: 600; }
+
+/* Option buttons */
+.option-btn {
+  display: flex; align-items: center; gap: 14px; padding: 16px 18px;
+  margin-bottom: 10px; border-radius: var(--r-md); cursor: pointer;
+  background: var(--bg); box-shadow: var(--raise-sm);
+  font-size: 15px; font-weight: 500; font-family: var(--font);
+  border: none; color: var(--text); text-align: left;
+  transition: all 0.15s ease; width: 100%;
+}
+.option-btn:active { box-shadow: var(--inset-sm); transform: scale(0.98); }
+.option-btn .letter-badge {
+  width: 32px; height: 32px; min-width: 32px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; color: var(--text-secondary);
+  background: var(--bg); box-shadow: var(--inset-sm);
+}
+.option-btn.correct {
+  box-shadow: 3px 3px 8px rgba(0,184,148,0.18), -3px -3px 8px #fff;
+  background: var(--green-bg);
+}
+.option-btn.correct .letter-badge { color: var(--green); }
+.option-btn.wrong {
+  box-shadow: inset 3px 3px 7px rgba(214,48,49,0.12), inset -3px -3px 7px #fff;
+  background: var(--red-bg);
+}
+.option-btn.wrong .letter-badge { color: var(--red); }
+
+/* ===== Progress ===== */
+.progress-bar-wrap { height: 8px; border-radius: 4px; margin-bottom: 16px; background: var(--bg); box-shadow: var(--inset-sm); overflow: hidden; }
+.progress-bar-fill { height: 100%; border-radius: 4px; background: var(--accent); box-shadow: 0 1px 3px rgba(108,92,231,0.3); transition: width 0.4s ease; }
+.progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; font-weight: 500; }
+
+/* ===== Report Chain ===== */
+.weakness-chain { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+.chain-node {
+  display: flex; align-items: center; gap: 12px; padding: 14px 18px;
+  border-radius: var(--r-md); font-size: 14px; font-weight: 500;
+}
+.chain-node.pass { background: var(--green-bg); box-shadow: 2px 2px 6px rgba(0,184,148,0.1), -2px -2px 6px #fff; }
+.chain-node.fail { background: var(--red-bg); box-shadow: 2px 2px 6px rgba(214,48,49,0.1), -2px -2px 6px #fff; }
+.chain-arrow { text-align: center; color: var(--text-tertiary); font-size: 12px; font-weight: 600; padding: 2px 0; }
+
+/* ===== Badge ===== */
+.badge-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.badge-item {
+  text-align: center; padding: 22px 12px; border-radius: var(--r-lg);
+  background: var(--bg); transition: all 0.3s ease;
+}
+.badge-item.earned { box-shadow: var(--raise-md); }
+.badge-item.locked { box-shadow: var(--inset-sm); opacity: 0.45; }
+.badge-icon { font-size: 30px; display: block; margin-bottom: 10px; }
+.badge-name { font-size: 12px; font-weight: 700; }
+
+/* ===== Shop / Boss / Parent ===== */
+.shop-item {
+  display: flex; align-items: center; gap: 12px; padding: 16px 18px;
+  background: var(--bg); border-radius: var(--r-md); margin-bottom: 10px;
+  box-shadow: var(--raise-sm);
+}
+.shop-item .item-name { font-size: 15px; font-weight: 600; flex: 1; }
+.shop-item .item-cost { font-family: var(--font-mono); font-weight: 700; color: var(--orange); min-width: 40px; text-align: right; margin: 0 8px; }
+.pin-input-group { display: flex; gap: 12px; justify-content: center; margin: 24px 0; }
+.pin-dot {
+  width: 54px; height: 62px; border-radius: var(--r-md); text-align: center;
+  font-size: 24px; font-family: var(--font-mono); color: var(--text);
+  background: var(--bg); box-shadow: var(--inset-md); border: none;
+}
+.pin-dot:focus { outline: none; box-shadow: inset 3px 3px 8px rgba(108,92,231,0.2), inset -3px -3px 8px #fff; }
+.add-reward-form { display: flex; gap: 8px; margin: 12px 0; }
+.add-reward-form input {
+  flex: 1; padding: 12px 16px; border-radius: var(--r-sm);
+  background: var(--bg); box-shadow: var(--inset-sm); border: none;
+  font-family: var(--font); font-size: 14px; color: var(--text);
+}
+.add-reward-form input:focus { outline: none; box-shadow: inset 3px 3px 7px rgba(108,92,231,0.15), inset -3px -3px 7px #fff; }
+.parent-data-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--shadow-dark-sm); font-size: 14px; }
+
+/* ===== Explanation ===== */
+.explain-box {
+  padding: 14px 18px; border-radius: var(--r-md); margin-top: 14px;
+  font-size: 13px; line-height: 1.6; color: var(--text-secondary);
+  background: var(--bg); box-shadow: var(--inset-sm);
+}
+
+/* ===== Item Pills (道具栏) ===== */
+.item-bar { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+.item-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 8px 18px; border-radius: var(--r-sm);
+  font-size: 12px; font-weight: 700; font-family: var(--font);
+  cursor: pointer; border: none; background: var(--bg);
+  transition: all 0.15s ease;
+}
+.item-btn.has-item { box-shadow: var(--raise-sm); color: var(--accent); }
+.item-btn.has-item:active { box-shadow: var(--inset-sm); }
+.item-btn.no-item { box-shadow: var(--inset-sm); color: var(--text-tertiary); cursor: default; opacity: 0.5; }
+
+/* ===== Time Chips ===== */
+.time-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.time-chip {
+  padding: 6px 12px; border-radius: var(--r-sm);
+  font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+  background: var(--bg);
+}
+
+/* ===== Toast ===== */
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 200; padding: 12px 24px; border-radius: var(--r-md);
+  font-size: 14px; font-weight: 700; pointer-events: none;
+  background: var(--bg); box-shadow: var(--raise-lg); color: var(--text);
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 1.8s forwards;
+}
+.toast.success { color: var(--green); }
+.toast.error { color: var(--red); }
+.toast.info { color: var(--accent); }
+@keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(-10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+@keyframes toastOut { from { opacity: 1; } to { opacity: 0; } }
+
+.empty-state { text-align: center; padding: 40px 20px; color: var(--text-tertiary); }
+.empty-state .empty-icon { font-size: 48px; display: block; margin-bottom: 12px; }
+
+/* ===== Boss Cards ===== */
+.boss-card {
+  display: flex; align-items: center; gap: 14px; padding: 20px;
+  background: var(--bg); border-radius: var(--r-lg); margin-bottom: 14px;
+  box-shadow: var(--raise-md); transition: all 0.25s ease;
+}
+.boss-card.unlocked { box-shadow: 5px 5px 14px rgba(108,92,231,0.12), -5px -5px 14px #fff; }
+
+@media (min-width: 768px) {
+  .knowledge-grid { grid-template-columns: repeat(3, 1fr); }
+  .badge-grid { grid-template-columns: repeat(4, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div id="app-container">
+
+  <!-- ===== Screen 1: Dashboard ===== -->
+  <div id="screen-dashboard" class="screen active">
+    <div class="top-bar">
+      <span class="top-bar-title">物理助手</span>
+      <span class="dash-level-badge" id="dash-level">Lv.1</span>
+    </div>
+    <div class="dash-header">
+      <div class="avatar">物</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-weight:800;font-size:1.2rem">物理探险家</span>
+        </div>
+        <div class="xp-bar-wrap"><div class="xp-bar-fill" id="dash-xp-bar" style="width:0%"></div></div>
+        <span style="font-size:0.7rem;color:var(--text-secondary);font-weight:500" id="dash-xp-text">0 / 200 XP</span>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-card coin"><div class="stat-value" id="dash-coins">0</div><div class="stat-label">金币</div></div>
+      <div class="stat-card streak"><div class="stat-value" id="dash-streak">0</div><div class="stat-label">连续天数</div></div>
+      <div class="stat-card badge"><div class="stat-value" id="dash-badges">0</div><div class="stat-label">徽章</div></div>
+    </div>
+    <div class="section-title">知识点</div>
+    <div class="knowledge-grid" id="dash-knowledge-grid"></div>
+    <div style="margin-top:22px">
+      <button class="btn-primary" style="display:block;width:100%" onclick="App.navigate('starmap')">查看知识星图</button>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn-secondary" style="display:block;width:100%" onclick="if(App.Exam.checkSavedExam()){if(confirm('有未完成的考试，是否继续？')){App.Exam._resume();}else{App.Exam.clearSavedExam();App.Exam.start();}}else{App.Exam.start();}">📝 综合考试 (20题·30分钟)</button>
+    </div>
+  </div>
+
+  <!-- ===== Screen 2: Star Map ===== -->
+  <div id="screen-starmap" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">知识星图</span>
+      <span style="font-size:0.75rem;color:var(--text-secondary)">点击节点诊断</span>
+    </div>
+    <div id="star-map-wrap"><canvas id="star-map"></canvas></div>
+    <div style="display:flex;gap:18px;justify-content:center;font-size:0.72rem;color:var(--text-secondary);font-weight:500">
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--green);margin-right:4px"></span>掌握</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--orange);margin-right:4px"></span>进行中</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--red);margin-right:4px"></span>薄弱</span>
+      <span><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#c8cdd4;margin-right:4px"></span>未解锁</span>
+    </div>
+  </div>
+
+  <!-- ===== Screen 3: Diagnosis ===== -->
+  <div id="screen-diagnosis" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.Diagnosis._abort()">←</button>
+      <span class="top-bar-title" id="diag-title">诊断挑战</span>
+      <span class="question-timer" id="diag-timer">0s</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="diag-progress-bar" style="width:0%"></div></div>
+    <div class="progress-label"><span id="diag-progress-text">第 1 / 3 题</span><span id="diag-score-text"></span></div>
+    <div class="question-card"><div class="question-stem" id="diag-stem">题目加载中...</div></div>
+    <div id="diag-options"></div>
+    <div id="diag-explanation" style="margin-top:12px"></div>
+    <div id="diag-item-bar" style="margin-top:16px"></div>
+  </div>
+
+  <!-- ===== Screen 4: Report ===== -->
+  <div id="screen-report" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">诊断报告</span>
+      <span></span>
+    </div>
+    <div class="card" style="text-align:center;margin-bottom:16px">
+      <div style="font-size:3rem" id="report-emoji">🔍</div>
+      <div style="font-size:1.1rem;font-weight:800;margin:8px 0" id="report-summary">诊断完成</div>
+      <div style="font-size:0.8rem;color:var(--text-secondary)" id="report-detail"></div>
+    </div>
+    <div class="section-title">薄弱知识链路</div>
+    <div class="weakness-chain" id="report-chain"></div>
+    <div class="section-title">建议操作</div>
+    <div id="report-recommendation" style="margin-bottom:16px"></div>
+    <button class="btn-primary" style="display:block;width:100%;margin-top:12px" id="report-start-practice">开始修复练习</button>
+    <button class="btn-secondary" style="margin-top:8px" onclick="App.navigate('starmap')">返回星图</button>
+  </div>
+
+  <!-- ===== Screen 5: Practice ===== -->
+  <div id="screen-practice" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.Practice._abort()">←</button>
+      <span class="top-bar-title" id="practice-title">练习关卡</span>
+      <span></span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="practice-progress-bar" style="width:0%"></div></div>
+    <div class="progress-label"><span id="practice-progress-text">第 1 / 10 题</span><span id="practice-score-text"></span></div>
+    <div class="question-card"><div class="question-stem" id="practice-stem">题目加载中...</div></div>
+    <div id="practice-options"></div>
+    <div id="practice-explanation" style="margin-top:12px"></div>
+    <div id="practice-item-bar" style="margin-top:16px"></div>
+    <div style="text-align:center;margin-top:12px">
+      <span style="font-size:0.8rem;font-weight:700" id="practice-streak-count"></span>
+    </div>
+  </div>
+
+  <!-- ===== Screen 6: Boss Select ===== -->
+  <div id="screen-boss-select" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">章节挑战</span>
+      <span style="font-size:0.75rem;color:var(--text-secondary)">Boss</span>
+    </div>
+    <div style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;text-align:center;font-weight:500">
+      掌握知识点后解锁章节综合测试
+    </div>
+    <div id="boss-list"></div>
+  </div>
+
+  <!-- ===== Screen 7: Boss Challenge ===== -->
+  <div id="screen-boss-challenge" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.Boss._abort()">←</button>
+      <span class="top-bar-title" id="boss-title">Boss挑战</span>
+      <span class="question-timer" id="boss-timer">0s</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="boss-progress-bar" style="width:0%"></div></div>
+    <div class="progress-label"><span id="boss-progress-text">第 1 / 10 题</span><span id="boss-score-display"></span></div>
+    <div class="question-card"><div class="question-stem" id="boss-stem">加载中...</div></div>
+    <div id="boss-options"></div>
+    <div id="boss-explanation" style="margin-top:12px"></div>
+    <div id="boss-item-bar" style="margin-top:16px"></div>
+  </div>
+
+  <!-- ===== Screen 8: Boss Result ===== -->
+  <div id="screen-boss-result" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('boss-select')">←</button>
+      <span class="top-bar-title">挑战结果</span>
+      <span></span>
+    </div>
+    <div class="card" style="text-align:center;margin-bottom:16px" id="boss-result-card"></div>
+    <div class="section-title">用时详情</div>
+    <div id="boss-time-detail" style="margin-bottom:16px"></div>
+    <button class="btn-primary" style="display:block;width:100%;margin-top:8px" id="boss-retry-btn">再次挑战</button>
+    <button class="btn-secondary" style="margin-top:8px" onclick="App.navigate('boss-select')">返回Boss列表</button>
+  </div>
+
+  <!-- ===== Screen 12: Exam ===== -->
+  <div id="screen-exam" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.Exam.exit()">←</button>
+      <span class="top-bar-title">综合考试</span>
+      <span class="question-timer" id="exam-timer" style="color:var(--accent)">⏱ 30:00</span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="exam-progress-bar" style="width:0%"></div></div>
+    <div class="progress-label"><span id="exam-phase-text">选择题 1/20</span><span></span></div>
+    <div class="question-card"><div class="question-stem" id="exam-stem">加载中...</div></div>
+    <div id="exam-options"></div>
+    <div id="exam-answer-input" style="display:none"></div>
+    <div id="exam-explanation" style="margin-top:12px"></div>
+    <p style="text-align:center;font-size:0.7rem;color:var(--text-tertiary);margin-top:12px">切换页面自动暂停计时</p>
+  </div>
+
+  <!-- ===== Screen 13: Exam Result ===== -->
+  <div id="screen-exam-result" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.Exam.clearSavedExam();App.examState=null;App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">考试成绩</span><span></span>
+    </div>
+    <div class="card" style="text-align:center" id="exam-result-card"></div>
+    <div class="section-title">选择题详情</div>
+    <div id="exam-mc-detail" style="margin-bottom:16px"></div>
+    <div class="section-title">计算题详情</div>
+    <div id="exam-calc-detail" style="margin-bottom:16px"></div>
+    <button class="btn-primary" style="display:block;width:100%" onclick="App.Exam.clearSavedExam();App.examState=null;App.Exam.start()">🔄 重新考试</button>
+    <button class="btn-secondary" style="margin-top:8px" onclick="App.Exam.clearSavedExam();App.examState=null;App.navigate('dashboard')">返回首页</button>
+  </div>
+
+  <!-- ===== Screen 9: Badge Wall ===== -->
+  <div id="screen-badges" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">成就</span>
+      <span style="font-size:0.75rem;color:var(--text-secondary)" id="badge-count-text"></span>
+    </div>
+    <div class="badge-grid" id="badge-grid"></div>
+  </div>
+
+  <!-- ===== Screen 10: Reward Shop ===== -->
+  <div id="screen-shop" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">奖励商店</span>
+      <span style="font-weight:800;color:var(--orange);font-family:var(--font-mono)" id="shop-balance">0</span>
+    </div>
+    <div id="shop-items"></div>
+    <div class="empty-state" id="shop-empty" style="display:none">
+      <span class="empty-icon">🛒</span><p>暂无物品</p><p style="font-size:0.75rem">去家长中心添加奖励</p>
+    </div>
+  </div>
+
+  <!-- ===== Screen 11: Parent Center ===== -->
+  <div id="screen-parent" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">家长中心</span>
+      <span style="font-size:0.75rem;color:var(--text-tertiary)">🔒</span>
+    </div>
+    <div id="parent-auth">
+      <div style="text-align:center;margin:36px 0">
+        <div style="font-size:2.8rem;margin-bottom:12px">🔐</div>
+        <p style="font-size:0.9rem;color:var(--text-secondary);font-weight:500">请输入家长密码</p>
+      </div>
+      <div class="pin-input-group" id="pin-inputs">
+        <input type="password" maxlength="1" class="pin-dot" id="pin-0" inputmode="numeric" pattern="[0-9]">
+        <input type="password" maxlength="1" class="pin-dot" id="pin-1" inputmode="numeric" pattern="[0-9]">
+        <input type="password" maxlength="1" class="pin-dot" id="pin-2" inputmode="numeric" pattern="[0-9]">
+        <input type="password" maxlength="1" class="pin-dot" id="pin-3" inputmode="numeric" pattern="[0-9]">
+      </div>
+      <p style="text-align:center;font-size:0.7rem;color:var(--text-tertiary);margin-top:8px" id="pin-error"></p>
+      <button class="btn-primary" style="display:block;width:100%;margin-top:16px" onclick="App.verifyPin()">验证</button>
+      <p style="text-align:center;font-size:0.7rem;color:var(--text-tertiary);margin-top:12px">默认密码: 0000</p>
+    </div>
+    <div id="parent-panel" style="display:none">
+      <div class="section-title">添加奖励物品</div>
+      <div class="add-reward-form">
+        <input type="text" id="reward-name-input" placeholder="奖励名称">
+        <input type="number" id="reward-cost-input" placeholder="金币" style="max-width:70px" min="10" value="100">
+        <button class="btn-sm btn-buy" onclick="App.addReward()">添加</button>
+      </div>
+      <div class="section-title">奖励列表</div>
+      <div id="parent-reward-list"></div>
+      <div class="section-title">待审批</div>
+      <div id="parent-approval-list"></div>
+      <div class="section-title">学习数据</div>
+      <div class="card" id="parent-data-view"></div>
+      <div style="margin-top:12px;font-size:0.75rem;color:var(--text-secondary)">
+        <span>修改密码: </span><input type="password" id="new-pin-input" maxlength="4" placeholder="4位" style="width:70px;background:var(--bg);box-shadow:var(--inset-sm);border:none;padding:6px 10px;border-radius:var(--r-sm);font-family:var(--font-mono);color:var(--text);text-align:center">
+        <button class="btn-sm btn-buy" onclick="App.Rewards.changePin(document.getElementById('new-pin-input').value)">修改</button>
+      </div>
+      <button class="btn-danger" style="margin-top:16px;width:100%;padding:14px;border-radius:var(--r-md);font-size:15px;font-weight:700" onclick="App.resetProgress()">重置全部学习数据</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bottom Navigation -->
+<nav id="bottom-nav">
+  <button class="nav-item active" data-screen="dashboard"><span class="nav-icon">◎</span>首页</button>
+  <button class="nav-item" data-screen="starmap"><span class="nav-icon">◉</span>星图</button>
+  <button class="nav-item" data-screen="badges"><span class="nav-icon">☆</span>成就</button>
+  <button class="nav-item" data-screen="boss-select"><span class="nav-icon">◆</span>挑战</button>
+  <button class="nav-item" data-screen="shop"><span class="nav-icon">□</span>兑换</button>
+  <button class="nav-item" data-screen="parent"><span class="nav-icon">◇</span>家长</button>
+</nav>
+
+<div id="toast-container"></div>
+
+<script src="js/data.js"></script>
+<script src="js/imported_questions.js"></script>
+<script src="js/boost_questions.js"></script>
+<script src="js/items.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/gamification.js"></script>
+<script src="js/rewards.js"></script>
+<script src="js/diagnosis.js"></script>
+<script src="js/practice.js"></script>
+<script src="js/boss.js"></script>
+<script src="js/exam.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/app.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(function() {});
+}
+</script>
+
+</body>
+</html>
