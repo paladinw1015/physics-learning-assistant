@@ -58,6 +58,9 @@ App.Practice = {
     var q = ps.questions[ps.currentQuestionIndex];
     if (!q) { this._finishPractice(); return; }
 
+    // 重置回答状态，允许新题目正常作答
+    ps._answered = false;
+
     var node = App.knowledgeGraph[ps.currentNodeId];
     document.getElementById('practice-title').textContent = '练习: ' + node.name;
 

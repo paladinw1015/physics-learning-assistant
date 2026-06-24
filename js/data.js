@@ -63,6 +63,27 @@ App.knowledgeGraph['c8_reference_frame'] = {
       correct: 1,
       explanation: '以开动的车为参照物，静止的车相对于它在后退。这是运动和静止相对性的体现。',
       testsPrerequisite: null
+    },
+    {
+      stem: '以下关于参照物的说法，错误的是？',
+      options: ['参照物可以任意选择', '参照物必须是静止不动的物体', '选不同的参照物，物体运动状态可能不同', '通常选地面或地面上不动的物体为参照物'],
+      correct: 1,
+      explanation: '参照物可以选静止的也可以选运动的，任何物体都可以选作参照物，不是必须选静止的。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '一艘船在河中顺流而下，船上的人看到岸上的树在向上游运动。此时人选的是____为参照物。',
+      options: ['河岸', '河水', '船', '树'],
+      correct: 2,
+      explanation: '以船为参照物，岸上的树相对于船向上游方向运动。选不同参照物，同一物体的运动描述不同。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '下列哪种现象最能说明"运动和静止是相对的"？',
+      options: ['太阳从东边升起西边落下', '高铁上看到并排慢行的列车似乎在"后退"', '苹果从树上掉下来是竖直向下的', '水往低处流'],
+      correct: 1,
+      explanation: '你乘高铁超越旁边同向慢车时，从你的车厢看那列车似乎在后退，但它也在前进——这就是相对运动。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -105,6 +126,27 @@ App.knowledgeGraph['c8_speed_concept'] = {
       options: ['48 km/h', '50 km/h', '52 km/h', '45 km/h'],
       correct: 0,
       explanation: '设总路程为2s。t1=s/40, t2=s/60。平均速度=2s/(t1+t2)=2s/(s/40+s/60)=2/(1/40+1/60)=48km/h。注意：平均速度≠速度的平均值！',
+      testsPrerequisite: null
+    },
+    {
+      stem: '一辆汽车前半段时间以 30km/h 行驶，后半段时间以 50km/h 行驶。全程平均速度约为？',
+      options: ['35 km/h', '40 km/h', '45 km/h', '48 km/h'],
+      correct: 1,
+      explanation: '设每段时间为 t。总路程=30t+50t=80t，总时间=2t，v=80t/2t=40km/h。时间相等时，平均速度=速度的算术平均。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于匀速直线运动，下列说法正确的是？',
+      options: ['速度大小不变就是匀速运动', '速度方向不变就是匀速运动', '速度大小和方向都不变的运动是匀速直线运动', '相等时间内路程相等的运动一定是匀速运动'],
+      correct: 2,
+      explanation: '匀速直线运动要求速度的大小和方向都不变。仅路程相等不能说明是匀速，可能是变速但巧合总路程相等。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '甲的速度是 5m/s，乙的速度是 18km/h，谁更快？',
+      options: ['甲更快', '乙更快', '一样快', '无法比较'],
+      correct: 2,
+      explanation: '乙：18km/h=18×1000/3600=5m/s。两者速度相同。比较速度前必须先统一单位。',
       testsPrerequisite: null
     }
   ],
@@ -149,6 +191,34 @@ App.knowledgeGraph['c8_force_concept'] = {
       correct: 2,
       explanation: '力的作用效果：①改变形状（形变）②改变运动状态（速度大小或方向改变）。力不能改变质量。',
       testsPrerequisite: null
+    },
+    {
+      stem: '力的三要素中，影响力的作用效果的因素不包括？',
+      options: ['力的大小', '力的方向', '力的作用点', '力的单位'],
+      correct: 3,
+      explanation: '力的三要素是大小、方向和作用点，它们共同决定力的作用效果。力的单位（牛顿）不影响作用效果。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于力的相互性，以下例子中正确的是？',
+      options: ['人推墙时只有人用了力', '鸡蛋碰石头，石头对鸡蛋的力更大', '游泳时人向后划水，水向前推人', '提水桶时只有手对桶有拉力'],
+      correct: 2,
+      explanation: '游泳时人向后推水，水给人向前的推力——这是力的相互性的典型应用。作用力与反作用力同时存在且大小相等。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '下列力的作用效果中，属于"改变物体运动状态"的是？',
+      options: ['用力拉弹簧使其变长', '用手捏易拉罐使其变扁', '踢足球使静止的球飞出去', '揉面团使其变形'],
+      correct: 2,
+      explanation: '足球从静止到飞出，速度从零变为有，运动状态改变。前两个选项是形变（改变形状），不是运动状态改变。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '一个物体受到两个力：F₁=3N 向东，F₂=4N 向南，这两个力的合力大小为？',
+      options: ['7N', '5N', '1N', '12N'],
+      correct: 1,
+      explanation: '两力垂直时合力=√(3²+4²)=5N（勾股定理）。初中常考此类垂直力合成。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -192,6 +262,27 @@ App.knowledgeGraph['c8_friction_basic'] = {
       correct: 1,
       explanation: '控制变量法：研究摩擦力与压力的关系时，保持接触面粗糙程度不变，只改变压力。',
       testsPrerequisite: null
+    },
+    {
+      stem: '自行车刹车时，闸皮与车圈之间的摩擦属于？',
+      options: ['静摩擦', '滑动摩擦', '滚动摩擦', '没有摩擦'],
+      correct: 1,
+      explanation: '刹车时闸皮与转动的车圈之间发生相对滑动，是滑动摩擦。摩擦使动能转化为热能，车轮减速。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '下列做法中，属于增大有益摩擦的是？',
+      options: ['在机器轴承中加润滑油', '在结冰路面上撒沙子', '气垫船底部喷出高压空气', '给门轴滴油'],
+      correct: 1,
+      explanation: '结冰路面撒沙子增加了接触面粗糙程度，增大轮胎与地面的摩擦力，防止打滑。其他选项都是减小摩擦。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '用 15N 的水平推力推重 50N 的木箱，木箱匀速直线运动。木箱受到的滑动摩擦力大小为？',
+      options: ['50N', '15N', '35N', '65N'],
+      correct: 1,
+      explanation: '匀速直线运动→二力平衡→水平方向摩擦力=推力=15N。摩擦力与重力无直接关系（水平面上 N=G）。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -233,6 +324,27 @@ App.knowledgeGraph['c9_newton_first_intro'] = {
       options: ['可以通过实验直接验证', '是在实验基础上推理得出的', '只适用于静止物体', '与惯性无关'],
       correct: 1,
       explanation: '牛顿第一定律（惯性定律）不能直接用实验验证（因为无法创造完全不受力的环境），是在实验+推理基础上得出的。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '公交车上常设有安全把手。当公交车突然启动时，站着的乘客会向____倾倒。',
+      options: ['前方', '后方', '左侧', '右侧'],
+      correct: 1,
+      explanation: '车突然启动向前，乘客的脚随车向前，但上身由于惯性要保持原来静止状态，所以向后倾倒。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '以下做法中，属于防止惯性带来危害的是？',
+      options: ['跳远前要先助跑', '锤头松了在地面上撞击几下', '汽车前排座椅安装安全带', '拍打衣服除去灰尘'],
+      correct: 2,
+      explanation: '安全带防止急刹车时人因惯性向前冲撞。其他三个是"利用"惯性的例子。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '宇航员在太空中（失重状态），用同样的力推一个大铁球和一个小乒乓球，哪个更容易推动？',
+      options: ['大铁球更容易', '乒乓球更容易', '一样容易', '都无法推动'],
+      correct: 1,
+      explanation: '质量越大的物体惯性越大，改变其运动状态越困难。太空失重但质量（惯性）不变，乒乓球质量小，惯性小，更容易被推动加速。',
       testsPrerequisite: null
     }
   ],
@@ -277,6 +389,27 @@ App.knowledgeGraph['g1_particle_reference'] = {
       correct: 2,
       explanation: '参考系可以任意选择（高中阶段选惯性系即可），不同的参考系下运动描述可能不同。',
       testsPrerequisite: 'c8_reference_frame'
+    },
+    {
+      stem: '研究以下问题时，能将研究对象视为质点的是？',
+      options: ['研究乒乓球选手的发球旋转角度', '研究跳水运动员空中翻腾的圈数', '研究马拉松运动员从起点到终点的运动时间', '研究体操运动员鞍马上的腿部姿态'],
+      correct: 2,
+      explanation: '马拉松全程远大于运动员大小，形状和大小对总时间影响可忽略。质点的核心判断标准：形状大小对研究问题的影响是否可以忽略。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于坐标系，下列说法正确的是？',
+      options: ['描述直线运动只需要一维坐标系', '坐标系和参考系是同一个概念', '坐标系一定要以地面为原点', '坐标系不能用来描述位置变化'],
+      correct: 0,
+      explanation: '直线运动用一个坐标轴（数轴）即可确定位置。参考系确定运动描述的基础，坐标系是实现参考系的数学工具。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '同一物体，相对于不同参考系运动状态可能完全不同——这说明了什么？',
+      options: ['物体的运动是绝对的', '运动的描述依赖于参考系的选择', '参考系必须是地面', '所有的参考系都能给出相同的运动描述'],
+      correct: 1,
+      explanation: '运动描述的相对性：选不同的参考系，同一物体的运动状态（静止/运动、速度快慢/方向）可能不同。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -318,6 +451,27 @@ App.knowledgeGraph['g1_time_displacement'] = {
       correct: 2,
       explanation: '矢量有大小和方向（位移、速度、力等）；标量只有大小（时间、质量、路程等）。',
       testsPrerequisite: null
+    },
+    {
+      stem: '以下各组物理量中，全部是矢量的是？',
+      options: ['位移、速度、加速度', '时间、位移、速度', '路程、时间、质量', '位移、路程、速率'],
+      correct: 0,
+      explanation: '位移、速度、加速度都有大小和方向，是矢量。时间、质量、路程、速率只有大小，是标量。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '某同学绕标准田径场（一圈 400m）跑步，从起点出发跑了两圈半。他的位移大小约为？',
+      options: ['1000m', '400m', '127m', '0m'],
+      correct: 2,
+      explanation: '两圈半跑了 400×2.5=1000m 路程。但终点在半圈位置，距起点直线距离≈直径=400/π≈127m。位移=起点到终点的直线距离。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '"第 3 秒初"和"第 3 秒末"这两个时刻之间隔了多久？',
+      options: ['0 秒', '1 秒', '2 秒', '3 秒'],
+      correct: 1,
+      explanation: '"第3秒初"即 t=2s 时刻，"第3秒末"即 t=3s 时刻，相隔 1 秒。注意区分时刻（时间点）和时间间隔（时间段）。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -358,6 +512,27 @@ App.knowledgeGraph['g1_velocity_accel'] = {
       options: ['2 m/s²', '-2 m/s²', '3 m/s²', '-3 m/s²'],
       correct: 1,
       explanation: 'a=Δv/Δt=(2-10)/4=-2m/s²。负号表示加速度方向与初速度方向相反（减速）。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '某物体做匀减速运动，加速度为 -3m/s²。这表示？',
+      options: ['物体的速度一定为负', '物体的速度每秒减少 3m/s', '物体的位移每秒减少 3m', '物体一定在向后运动'],
+      correct: 1,
+      explanation: '加速度为-3m/s²，即 Δv/Δt=-3，速度每秒减少 3m/s。加速度的正负取决于正方向的选取，与速度方向无关。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于平均速度和瞬时速度，下列说法正确的是？',
+      options: ['平均速度就是速度的平均值', '瞬时速度是 Δt→0 时平均速度的极限', '匀速运动中瞬时速度不断变化', '平均速度的大小就是平均速率'],
+      correct: 1,
+      explanation: '瞬时速度是时间趋近于零时平均速度的极限值。平均速度=位移/时间≠速度的平均值。平均速率=路程/时间≥平均速度的大小。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '甲的速度从 0 均匀增加到 20m/s 用了 10s，乙的速度从 0 均匀增加到 10m/s 用了 2s。谁的加速度大？',
+      options: ['甲大', '乙大', '一样大', '无法比较'],
+      correct: 1,
+      explanation: '甲：a=20/10=2m/s²；乙：a=10/2=5m/s²。乙的加速度更大——加速度反映速度变化的快慢，不是最终速度的大小。',
       testsPrerequisite: null
     }
   ],
@@ -401,6 +576,27 @@ App.knowledgeGraph['g1_linear_motion'] = {
       correct: 2,
       explanation: '匀变速运动中，中间时刻速度v_t/2=(v₀+v)/2，中间位置速度v_x/2=√[(v₀²+v²)/2]。可证明v_x/2 > v_t/2（v₀≠v时）。',
       testsPrerequisite: null
+    },
+    {
+      stem: '做匀变速直线运动的物体，经过 A、B 两点的速度分别为 v_A 和 v_B。则经过 AB 中点时的速度为？',
+      options: ['(v_A+v_B)/2', '√[(v_A²+v_B²)/2]', '(v_A+v_B)', '√(v_A×v_B)'],
+      correct: 1,
+      explanation: '中间位置速度 v_x/2=√[(v_A²+v_B²)/2]。它大于中间时刻速度(v_A+v_B)/2（v_A≠v_B时）。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '一辆汽车从静止开始以 2m/s² 匀加速行驶，第 4 秒内的位移为？',
+      options: ['7m', '8m', '16m', '32m'],
+      correct: 0,
+      explanation: '前4秒位移=x₄=½×2×16=16m；前3秒位移=x₃=½×2×9=9m。第4秒内=x₄-x₃=16-9=7m。注意"n秒内"和"第n秒内"的区别。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '做匀减速直线运动的物体，通过 16m 的距离后速度减为原来的一半，再运动多远停下？',
+      options: ['16/3 m', '8 m', '4 m', '16 m'],
+      correct: 0,
+      explanation: '设初速 v，一半处速度 v/2。v²-(v/2)²=2a×16→3v²/4=32a。停下：v²=2aX→X/(16)=? 由 v²-(v/2)²=2a×16 和 v²=2aX 联立得 X/(16)=4/3→后续距离=64/3-16=16/3 m。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -443,6 +639,27 @@ App.knowledgeGraph['g1_free_fall'] = {
       correct: 2,
       explanation: '真空中没有空气阻力，所有物体自由落体加速度都是g。伽利略的经典结论。',
       testsPrerequisite: null
+    },
+    {
+      stem: '自由落体运动中，第 1 秒内、第 2 秒内、第 3 秒内的位移之比为？',
+      options: ['1:2:3', '1:3:5', '1:4:9', '1:1:1'],
+      correct: 1,
+      explanation: '初速为零的匀加速运动，等时间间隔内位移之比为 1:3:5:7...（奇数比）。自由落体是初速为零、a=g 的匀加速运动。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于自由落体加速度 g，下列说法正确的是？',
+      options: ['质量大的物体 g 大', '体积小的物体 g 大', '同一地点所有物体自由落体的 g 都相同', 'g 随下落速度增大而增大'],
+      correct: 2,
+      explanation: '同一地点所有物体自由落体的 g 相同（≈9.8m/s²），与质量、体积、形状无关。区别在于空气阻力是否可忽略。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '从高处每隔 1 秒释放一个小球，连续释放 3 个。在第三个球刚释放时，第一个球和第二个球之间的距离为？(g=10m/s²)',
+      options: ['5m', '10m', '15m', '20m'],
+      correct: 2,
+      explanation: '第三个球刚释放时：第一个球已下落 2s→h₁=½×10×4=20m；第二个球已下落 1s→h₂=5m。距离=20-5=15m。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -484,6 +701,27 @@ App.knowledgeGraph['g1_gravity_elasticity'] = {
       correct: 2,
       explanation: '重力是地球对物体的吸引力。任何物体都受重力（地球上），方向竖直向下。',
       testsPrerequisite: 'c8_force_concept'
+    },
+    {
+      stem: '一根弹簧受到 4N 拉力时伸长 2cm。如果受到 6N 拉力，伸长量为？(弹性限度内)',
+      options: ['2cm', '3cm', '4cm', '5cm'],
+      correct: 1,
+      explanation: 'F=kx，k=F₁/x₁=4/0.02=200N/m。x₂=F₂/k=6/200=0.03m=3cm。弹性限度内，伸长量与拉力成正比。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于弹力的方向，以下说法正确的是？',
+      options: ['支持力方向一定竖直向上', '绳子拉力方向一定沿绳子指向绳子伸长的方向', '绳子拉力方向一定沿绳子且指向绳子收缩的方向', '弹力方向一定与接触面平行'],
+      correct: 2,
+      explanation: '绳拉力沿绳且指向绳子收缩的方向。支持力方向垂直于接触面指向被支持的物体，不一定竖直向上。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于重力和弹力的区别，下列说法错误的是？',
+      options: ['重力是地球对物体的吸引力', '弹力是接触力，需要接触才产生', '重力方向总是垂直于水平面向下', '弹力的大小一定等于物体的重力'],
+      correct: 3,
+      explanation: '弹力大小不一定等于重力。如斜面上物体受到的支持力 N=mgcosθ<mg。弹力大小取决于形变程度和受力平衡。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -525,6 +763,27 @@ App.knowledgeGraph['g1_friction'] = {
       options: ['30N', '20N', '100N', '0N'],
       correct: 1,
       explanation: '最大静摩擦力≈30N，20N<30N，木箱静止→静摩擦力=推力=20N。不要看到μ就用f=μN！',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于静摩擦力和滑动摩擦力的关系，正确的是？',
+      options: ['静摩擦力一定小于滑动摩擦力', '最大静摩擦力一般略大于滑动摩擦力', '滑动摩擦力一定大于静摩擦力', '两者大小总是相等'],
+      correct: 1,
+      explanation: '实验表明：最大静摩擦力一般略大于滑动摩擦力。这就是"推动瞬间最费力，推动后省力一些"的原因。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '物体在斜面上匀速下滑，已知斜面倾角为 θ，动摩擦因数为 μ。下列关系正确的是？',
+      options: ['μ=sinθ', 'μ=cosθ', 'μ=tanθ', 'μ=1/tanθ'],
+      correct: 2,
+      explanation: '匀速下滑→合力为零→mgsinθ=μmgcosθ→μ=tanθ。这个结论只对匀速下滑成立。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '用水平力 F 将物体压在竖直墙上，物体静止。如果减小 F，物体将？',
+      options: ['一定下滑', '一定静止', '若减小后最大静摩擦力仍≥重力则静止，否则下滑', '物体将上升'],
+      correct: 2,
+      explanation: '竖直方向：静摩擦力=重力（不变）。但最大静摩擦力随 F 减小而减小。当最大静摩擦力<重力时物体下滑。关键：实际静摩擦力≠最大静摩擦力。',
       testsPrerequisite: null
     }
   ],
@@ -568,6 +827,27 @@ App.knowledgeGraph['g1_force_synthesis'] = {
       correct: 1,
       explanation: '力的分解通常按实际作用效果来分解（如斜面上重力分解为下滑力和正压力）。也可正交分解。',
       testsPrerequisite: null
+    },
+    {
+      stem: '两个力 F₁ 和 F₂ 的合力为 F。以下哪种说法是错误的？',
+      options: ['|F₁-F₂|≤F≤F₁+F₂', 'F 一定大于 F₁', 'F 可能小于其中一个分力', '两力夹角120°且大小相等时，F=F₁=F₂'],
+      correct: 1,
+      explanation: '合力可能小于分力。例：两力反向时合力=两力之差。合力的范围是|F₁-F₂|到 F₁+F₂ 之间，F 可能小于 F₁。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '在光滑斜面上放一重为 G 的物体（斜面倾角 θ）。物体对斜面的压力大小为？',
+      options: ['G', 'Gcosθ', 'Gsinθ', 'Gtanθ'],
+      correct: 1,
+      explanation: '重力分解：垂直斜面分量=Gcosθ，即物体对斜面的正压力（相互作用力）。沿斜面分量=Gsinθ，是使物体下滑的力。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '正交分解法的核心优势是什么？',
+      options: ['能分解更多力', '计算更复杂但更精确', '将矢量运算转化为代数运算，方便列平衡方程', '只适用于两个力的合成'],
+      correct: 2,
+      explanation: '正交分解将复杂的矢量合成转化为沿坐标轴方向的代数运算。把所有力分解到 x、y 轴，分别列合力为零（或 F=ma）的方程求解。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -610,6 +890,27 @@ App.knowledgeGraph['g1_newton_first'] = {
       correct: 2,
       explanation: '人跳起时与火车有相同的水平速度，由于惯性，水平方向保持这个速度，所以落回起跳点。',
       testsPrerequisite: null
+    },
+    {
+      stem: '关于惯性和牛顿第一定律，下列说法正确的是？',
+      options: ['物体受力就会改变运动状态', '物体不受力时一定静止', '物体运动状态改变时一定受到了力', '只要物体运动，它一定受到了力的作用'],
+      correct: 2,
+      explanation: '牛顿第一定律：不受力→静止或匀速直线运动。其逆否命题：运动状态改变→一定受到了力。力是改变运动状态的原因。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '以下现象中与惯性无关的是？',
+      options: ['抖落衣服上的灰尘', '子弹离开枪口后继续向前运动', '苹果因重力而下落', '汽车急转弯时乘客向外侧倾斜'],
+      correct: 2,
+      explanation: '苹果下落因为重力（受力产生加速度），不是惯性。其他三个都体现了惯性的作用——物体保持原来运动状态的性质。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '封闭车厢内悬挂的小球，当车辆向左转弯时，小球会向哪个方向摆动？',
+      options: ['向左', '向右', '不摆动', '向前'],
+      correct: 1,
+      explanation: '车向左转，小球由于惯性要保持原来的运动方向（向前），相对于车厢向右摆动。与"车急刹人前倾"原理相同。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -650,6 +951,27 @@ App.knowledgeGraph['g1_newton_third'] = {
       options: ['人拉绳子和绳子拉人', '地球吸引月球和月球吸引地球', '物体放在桌面上，重力和支持力', '锤子敲钉子和钉子敲锤子'],
       correct: 2,
       explanation: '重力和支持力作用在同一物体上，等大反向共线→平衡力。其他选项都是相互作用力（作用在不同物体上）。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '马拉着车在水平路面上加速前进。马对车的拉力____车对马的拉力。',
+      options: ['大于', '等于', '小于', '无法确定'],
+      correct: 1,
+      explanation: '相互作用力总是大小相等！车能加速不是因为马对车的力大于车对马的力，而是因为马对车的力大于地面给车的摩擦力。分清"力的大小"和"合力效果"。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '以下物体受到的力中，哪一对是平衡力？',
+      options: ['放在斜面上的物体，重力和斜面对物体的支持力', '悬挂在天花板上的灯，灯的重力和绳子对灯的拉力', '人站在地面上，人对地面的压力和地面对人的支持力', '锤子敲钉子，锤对钉的力和钉对锤的力'],
+      correct: 1,
+      explanation: '灯静止→二力平衡：重力和绳拉力都作用在灯上，等大反向共线。A 错（两力不共线），C 和 D 是相互作用力（作用在不同物体上）。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于作用力与反作用力和平衡力的区别，下列说法正确的是？',
+      options: ['它们都等大反向，所以效果相同', '平衡力可以抵消（作用在同一物体上），相互作用力不能抵消（作用在不同物体上）', '相互作用力也可以相互抵消', '两者没有区别'],
+      correct: 1,
+      explanation: '平衡力作用在同一物体上，合力为零可抵消。相互作用力作用在不同物体上，分别产生各自的加速度，不能抵消。这是最核心的区别。',
       testsPrerequisite: null
     }
   ],
@@ -692,6 +1014,27 @@ App.knowledgeGraph['g1_newton_second'] = {
       correct: 1,
       explanation: 'F-f=ma→20-f=4×2→f=12N。牛顿第二定律中的F是合力。先受力分析，再列方程。',
       testsPrerequisite: 'g1_force_synthesis'
+    },
+    {
+      stem: '质量为 m 的物体在光滑水平面上，受到水平力 F 作用，加速度为 a。如果力变为 2F、质量变为 2m，加速度为？',
+      options: ['a/2', 'a', '2a', '4a'],
+      correct: 1,
+      explanation: 'a\'=F\'/m\'=2F/(2m)=F/m=a。加速度不变！F 和 m 同比例增大，a 不变——a 由 F 和 m 的比值决定。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '一个物体在多个力作用下做匀速直线运动。如果突然撤去其中一个力（其他力保持不变），物体将？',
+      options: ['立即停止', '继续匀速直线运动', '做匀变速运动', '速度逐渐减小至零'],
+      correct: 2,
+      explanation: '撤去一个力后原来的平衡被打破，合力=被撤去的那个力的大小（方向相反）。有恒定合力→有恒定加速度→匀变速运动。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '升降机内放置一个体重计，人站在上面。升降机以加速度 a 匀减速上升，体重计的读数____人的真实体重。',
+      options: ['大于', '等于', '小于', '无法判断'],
+      correct: 2,
+      explanation: '匀减速上升→加速度向下→合力向下→mg-N=ma→N=mg-ma<mg→失重。推导关键：加速度方向决定超重/失重，加速度向下则失重。',
+      testsPrerequisite: null
     }
   ],
   practiceQuestions: [
@@ -733,6 +1076,27 @@ App.knowledgeGraph['g1_newton_application'] = {
       options: ['变大', '变小', '不变', '无法判断'],
       correct: 1,
       explanation: '加速上升→超重→等效重力g\'=g+a→T=2π√(L/g\')→T变小。加速度向上等效重力增大。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '在光滑水平面上，两个用轻绳连接的木块 A(m) 和 B(2m)，用水平力 F 拉 B。轻绳中的拉力大小为？',
+      options: ['F', 'F/3', '2F/3', 'F/2'],
+      correct: 1,
+      explanation: '整体法求加速度：a=F/(m+2m)=F/(3m)。隔离 A 求绳拉力（内力）：T=ma=F/3。求内力用隔离法。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '物体以一定的初速度冲上粗糙斜面，达到最高点后下滑。上滑时的加速度____下滑时的加速度（比较大小）。',
+      options: ['大于', '等于', '小于', '无法比较'],
+      correct: 0,
+      explanation: '上滑：摩擦力沿斜面向下，合力=mgsinθ+f→a₁=gsinθ+μgcosθ。下滑：摩擦力沿斜面向上，合力=mgsinθ-f→a₂=gsinθ-μgcosθ。a₁>a₂。',
+      testsPrerequisite: null
+    },
+    {
+      stem: '关于超重和失重，下列说法正确的是？',
+      options: ['超重就是物体变重了', '失重就是物体失去了重力', '超重和失重是视重（支持力或拉力）的变化，重力本身不变', '只有在电梯中才会出现超重和失重'],
+      correct: 2,
+      explanation: '超重和失重是视重（N 或 T）与重力的比较，物体的重力 mg 始终不变。任何有加速度的系统都可能出现超重或失重。',
       testsPrerequisite: null
     }
   ],
