@@ -12,12 +12,19 @@ App.Diagnosis = {
       return;
     }
 
+    // 诊断题随机打乱 + 导入真题
+    var diagQuestions = node.diagnosticQuestions.slice().concat(node._importedDiagnostic || []);
+    for (var i = diagQuestions.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = diagQuestions[i]; diagQuestions[i] = diagQuestions[j]; diagQuestions[j] = tmp;
+    }
+
     App.diagnosisState = {
       currentNodeId: nodeId,
       rootNodeId: nodeId,
       chain: [],
       currentQuestionIndex: 0,
-      questions: node.diagnosticQuestions.slice().concat(node._importedDiagnostic || []),
+      questions: diagQuestions,
       answers: [],
       startTime: Date.now(),
       questionStartTime: 0,
@@ -41,6 +48,9 @@ App.Diagnosis = {
     var ds = App.diagnosisState;
     var q = ds.questions[ds.currentQuestionIndex];
     if (!q) { this._finishNode(); return; }
+
+    // 重置回答状态，允许新题目正常作答
+    ds._answered = false;
 
     // 标题
     var node = App.knowledgeGraph[ds.currentNodeId];
@@ -211,7 +221,12 @@ App.Diagnosis = {
           var preqNode = App.knowledgeGraph[preqId];
           ds.currentNodeId = preqId;
           ds.currentQuestionIndex = 0;
-          ds.questions = preqNode.diagnosticQuestions.slice().concat(preqNode._importedDiagnostic || []);
+          var preqQuestions = preqNode.diagnosticQuestions.slice().concat(preqNode._importedDiagnostic || []);
+          for (var k = preqQuestions.length - 1; k > 0; k--) {
+            var l = Math.floor(Math.random() * (k + 1));
+            var tmp2 = preqQuestions[k]; preqQuestions[k] = preqQuestions[l]; preqQuestions[l] = tmp2;
+          }
+          ds.questions = preqQuestions;
           ds.answers = [];
           ds.questionTimes = [];
           ds.perfectSoFar = true;
