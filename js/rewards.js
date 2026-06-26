@@ -53,7 +53,10 @@ App.Rewards = {
   },
 
   verifyPin: function(inputPin) {
-    if (inputPin === (App.userProgress.parentPin || '0000')) {
+    var storedPin = App.userProgress.parentPin;
+    // 兼容旧数据：如果pin为空或undefined则使用默认值
+    if (!storedPin || storedPin === '') storedPin = '0000';
+    if (String(inputPin) === String(storedPin)) {
       document.getElementById('parent-auth').style.display = 'none';
       document.getElementById('parent-panel').style.display = 'block';
       document.getElementById('pin-error').textContent = '';
@@ -70,8 +73,18 @@ App.Rewards = {
 
   changePin: function(newPin) {
     if (!/^\d{4}$/.test(newPin)) { App.toast('密码需4位数字', 'error'); return; }
+    var oldPin = App.userProgress.parentPin || '0000';
     App.userProgress.parentPin = newPin;
+    // 首次从默认密码修改为自定义密码时给予奖励
+    if (oldPin === '0000' && newPin !== '0000' && !App.userProgress._pinChangedOnce) {
+      App.userProgress._pinChangedOnce = true;
+      var reward = 20;
+      App.Gamification.addCoins(reward);
+      App.Gamification.addXp(50);
+      App.toast('🔐 密码已修改！奖励 +' + reward + ' 金币 +50XP', 'success');
+    } else {
+      App.toast('密码已修改', 'success');
+    }
     App.Storage.save();
-    App.toast('密码已修改', 'success');
   }
 };

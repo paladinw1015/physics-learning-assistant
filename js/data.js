@@ -15,7 +15,7 @@ App.userProgress = App.userProgress || {
   _diagnosisCount: 0, _practiceCount: 0,
   _hasPerfectDiag: false, _hasSpeedAnswer: false,
   _hasSpeedImprove: false, _hasComeback: false,
-  _lastDailyClaim: ''
+  _lastDailyClaim: '', _pinChangedOnce: false
 };
 App.diagnosisState = App.diagnosisState || { currentNodeId: null, chain: [], currentQuestionIndex: 0, questions: [], answers: [], startTime: 0, questionStartTime: 0, questionTimes: [], totalXpEarned: 0, totalCoinsEarned: 0, perfectSoFar: true, fastAnswers: 0 };
 App.practiceState = App.practiceState || { currentNodeId: null, currentQuestionIndex: 0, questions: [], answers: [], startTime: 0, questionStartTime: 0, questionTimes: [], streakCount: 0, totalCorrect: 0, totalXpEarned: 0, totalCoinsEarned: 0, fastAnswers: 0, allCorrectSoFar: true };

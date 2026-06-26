@@ -195,9 +195,68 @@ App.Diagnosis = {
     if (score < 80) {
       this._tracePrerequisites();
     } else {
-      // 所有前置都已检查，生成报告
+      // 检查是否需要返回之前失败的知识点重试
+      if (this._returnToFailedParent()) {
+        return;
+      }
+      // 所有节点都已通过，生成报告
       this._generateReport();
     }
+  },
+
+  // 追溯前置后返回失败节点重试
+  _returnToFailedParent: function() {
+    var ds = App.diagnosisState;
+    // 从chain中找最后一个失败且可重试的节点
+    for (var i = ds.chain.length - 2; i >= 0; i--) {
+      var entry = ds.chain[i];
+      if (!entry.passed) {
+        // 检查该节点是否在后续chain中已被重试通过
+        var alreadyRetried = false;
+        for (var m = i + 1; m < ds.chain.length; m++) {
+          if (ds.chain[m].nodeId === entry.nodeId && ds.chain[m].passed) {
+            alreadyRetried = true; break;
+          }
+        }
+        if (alreadyRetried) continue;
+
+        var failedNode = App.knowledgeGraph[entry.nodeId];
+        if (!failedNode || !failedNode.prerequisites) continue;
+        // 检查失败节点的所有前置是否都已通过(在chain中)
+        var allPrereqsPassed = true;
+        for (var j = 0; j < failedNode.prerequisites.length; j++) {
+          var found = false;
+          for (var k = 0; k < ds.chain.length; k++) {
+            if (ds.chain[k].nodeId === failedNode.prerequisites[j] && ds.chain[k].passed) {
+              found = true; break;
+            }
+          }
+          if (!found) { allPrereqsPassed = false; break; }
+        }
+        if (allPrereqsPassed) {
+          // 返回失败节点重试
+          ds.currentNodeId = entry.nodeId;
+          ds.currentQuestionIndex = 0;
+          var questions = failedNode.diagnosticQuestions.slice().concat(failedNode._importedDiagnostic || []);
+          for (var q = questions.length - 1; q > 0; q--) {
+            var r = Math.floor(Math.random() * (q + 1));
+            var tmp = questions[q]; questions[q] = questions[r]; questions[r] = tmp;
+          }
+          ds.questions = questions;
+          ds.answers = [];
+          ds.questionTimes = [];
+          ds.perfectSoFar = true;
+          ds.fastAnswers = 0;
+          ds.questionStartTime = Date.now();
+          App.toast('前置已掌握，重新挑战: ' + failedNode.name, 'info');
+          this._renderQuestion();
+          return true;
+        }
+        // 还有前置未通过，继续向前找更早的失败节点
+        continue;
+      }
+    }
+    return false;
   },
 
   // 追溯前置知识点
@@ -238,7 +297,8 @@ App.Diagnosis = {
         }
       }
     }
-    // 没有更多前置可追溯
+    // 没有更多前置可追溯 - 检查是否有失败节点需要返回
+    if (this._returnToFailedParent()) return;
     this._generateReport();
   },
 
