@@ -1,25 +1,88 @@
 // ===== Boss挑战系统 =====
 App.Boss = {
 
-  // Boss定义
-  BOSSES: [
-    { id: 'boss_ch1', name: '运动描述之龙', icon: '🌀', chapter: '必修一·运动的描述',
-      desc: '质点、位移、速度、加速度——运动学基础的综合考验',
-      nodeIds: ['g1_particle_reference', 'g1_time_displacement', 'g1_velocity_accel'],
-      unlockCount: 2, color: '#00f0ff', xpMultiplier: 2, coinMultiplier: 2 },
-    { id: 'boss_ch2', name: '变速魔王', icon: '🚀', chapter: '必修一·匀变速直线运动',
-      desc: '匀变速公式、自由落体、v-t图像——计算能力的终极测试',
-      nodeIds: ['g1_linear_motion', 'g1_free_fall'],
-      unlockCount: 2, color: '#fbbf24', xpMultiplier: 2.5, coinMultiplier: 2.5 },
-    { id: 'boss_ch3', name: '力学武士', icon: '⚔️', chapter: '必修一·相互作用',
-      desc: '重力弹力摩擦力、力的合成与分解——受力分析大考',
-      nodeIds: ['g1_gravity_elasticity', 'g1_friction', 'g1_force_synthesis'],
-      unlockCount: 2, color: '#ff6b6b', xpMultiplier: 3, coinMultiplier: 3 },
-    { id: 'boss_ch4', name: '牛顿之果', icon: '🍎', chapter: '必修一·牛顿运动定律',
-      desc: '三大定律+连接体+超重失重——力与运动的终极Boss',
-      nodeIds: ['g1_newton_first', 'g1_newton_second', 'g1_newton_third', 'g1_newton_application'],
-      unlockCount: 3, color: '#ffd700', xpMultiplier: 3.5, coinMultiplier: 3.5 }
-  ],
+  // Boss定义 - 各学科独立配置
+  BOSSES_POOL: {
+    physics: [
+      { id: 'boss_ch1', name: '运动描述之龙', icon: '🌀', chapter: '必修一·运动的描述',
+        desc: '质点、位移、速度、加速度——运动学基础的综合考验',
+        nodeIds: ['g1_particle_reference', 'g1_time_displacement', 'g1_velocity_accel'],
+        unlockCount: 2, color: '#00f0ff', xpMultiplier: 2, coinMultiplier: 2 },
+      { id: 'boss_ch2', name: '变速魔王', icon: '🚀', chapter: '必修一·匀变速直线运动',
+        desc: '匀变速公式、自由落体、v-t图像——计算能力的终极测试',
+        nodeIds: ['g1_linear_motion', 'g1_free_fall'],
+        unlockCount: 2, color: '#fbbf24', xpMultiplier: 2.5, coinMultiplier: 2.5 },
+      { id: 'boss_ch3', name: '力学武士', icon: '⚔️', chapter: '必修一·相互作用',
+        desc: '重力弹力摩擦力、力的合成与分解、力矩平衡——受力分析大考',
+        nodeIds: ['g1_gravity_elasticity', 'g1_friction', 'g1_force_synthesis', 'g1_torque_balance'],
+        unlockCount: 3, color: '#ff6b6b', xpMultiplier: 3, coinMultiplier: 3 },
+      { id: 'boss_ch4', name: '牛顿之果', icon: '🍎', chapter: '必修一·牛顿运动定律',
+        desc: '三大定律+连接体+超重失重——力与运动的终极Boss',
+        nodeIds: ['g1_newton_first', 'g1_newton_second', 'g1_newton_third', 'g1_newton_application'],
+        unlockCount: 3, color: '#ffd700', xpMultiplier: 3.5, coinMultiplier: 3.5 }
+    ],
+    chemistry: [
+      { id: 'boss_ch1', name: '物质分类大师', icon: '🧪', chapter: '必修一·物质及其变化',
+        desc: '物质分类、离子反应、氧化还原——基本概念的综合考验',
+        nodeIds: ['ch1_matter_classify', 'ch1_ion_reaction', 'ch1_redox'],
+        unlockCount: 2, color: '#00b894', xpMultiplier: 2, coinMultiplier: 2 },
+      { id: 'boss_ch2', name: '元素掌控者', icon: '⚗️', chapter: '必修一·钠与氯',
+        desc: '钠、氯及其化合物、物质的量——元素化学的基石',
+        nodeIds: ['ch1_sodium', 'ch1_chlorine', 'ch1_mole'],
+        unlockCount: 2, color: '#fdcb6e', xpMultiplier: 2.5, coinMultiplier: 2.5 },
+      { id: 'boss_ch3', name: '周期律大师', icon: '📊', chapter: '必修一·物质结构 周期律',
+        desc: '原子结构、元素周期律、化学键——微观世界的法则',
+        nodeIds: ['ch1_atom_structure', 'ch1_periodic_law', 'ch1_chemical_bond'],
+        unlockCount: 2, color: '#e17055', xpMultiplier: 3, coinMultiplier: 3 },
+      { id: 'boss_ch4', name: '化学全能王', icon: '👨‍🔬', chapter: '必修二·综合',
+        desc: '非金属元素+化学反应能量+有机物——高一化学终极挑战',
+        nodeIds: ['ch2_sulfur', 'ch2_nitrogen', 'ch2_reaction_energy', 'ch2_organic_base'],
+        unlockCount: 3, color: '#6c5ce7', xpMultiplier: 3.5, coinMultiplier: 3.5 }
+    ],
+    math: [
+      { id: 'boss_ch1', name: '函数征服者', icon: '📐', chapter: '高一上·函数与指数对数',
+        desc: '集合、不等式、函数单调性奇偶性——代数基础的综合考验',
+        nodeIds: ['math_set_logic', 'math_inequality', 'math_func_concept', 'math_monotonicity', 'math_parity'],
+        unlockCount: 3, color: '#00b894', xpMultiplier: 2, coinMultiplier: 2 },
+      { id: 'boss_ch2', name: '初等函数专家', icon: '📈', chapter: '高一上·指数对数与零点',
+        desc: '指数函数、对数函数、函数零点——计算与图像分析能力',
+        nodeIds: ['math_exponential', 'math_logarithm', 'math_func_zero'],
+        unlockCount: 2, color: '#fdcb6e', xpMultiplier: 2.5, coinMultiplier: 2.5 },
+      { id: 'boss_ch3', name: '数列与矩阵大师', icon: '📏', chapter: '高一下·数列矩阵与向量',
+        desc: '三角函数、数列、矩阵、向量、复数——数形结合大考',
+        nodeIds: ['math_trig_basics', 'math_sequence', 'math_matrix', 'math_vector', 'math_complex'],
+        unlockCount: 3, color: '#e17055', xpMultiplier: 3, coinMultiplier: 3 }
+    ],
+    english: [
+      { id: 'boss_ch1', name: '时态与语态大师', icon: '⏰', chapter: '语法·时态语态',
+        desc: '8种时态+被动语态——时间表达的综合掌握',
+        nodeIds: ['en_tense_simple_cont', 'en_tense_perfect', 'en_passive'],
+        unlockCount: 2, color: '#e17055', xpMultiplier: 2, coinMultiplier: 2 },
+      { id: 'boss_ch2', name: '从句体系精通', icon: '📝', chapter: '语法·从句',
+        desc: '名词性从句+定语从句+状语从句——复合句的综合考验',
+        nodeIds: ['en_noun_clause', 'en_relative_clause', 'en_adverbial_clause'],
+        unlockCount: 2, color: '#6c5ce7', xpMultiplier: 2.5, coinMultiplier: 2.5 },
+      { id: 'boss_ch3', name: '语法全能大师', icon: '📖', chapter: '语法·综合',
+        desc: '情态虚拟+非谓语+主谓一致+倒装——高中语法终极Boss',
+        nodeIds: ['en_modal', 'en_subjunctive', 'en_nonfinite_infinitive', 'en_nonfinite_participle', 'en_sv_agreement', 'en_inversion'],
+        unlockCount: 4, color: '#00b894', xpMultiplier: 3.5, coinMultiplier: 3.5 }
+    ],
+    geography: [
+      { id: 'boss_ch1', name: '大气征服者', icon: '🌤️', chapter: '必修一·大气',
+        desc: '大气受热、热力环流、气压带风带、天气系统——气象学的综合考验',
+        nodeIds: ['geo_atmosphere_heat', 'geo_thermal_wind', 'geo_pressure_belts', 'geo_weather_systems'],
+        unlockCount: 3, color: '#2ecc71', xpMultiplier: 2, coinMultiplier: 2 },
+      { id: 'boss_ch2', name: '地球系统专家', icon: '🌍', chapter: '必修一·水与地表形态',
+        desc: '水循环、海水运动、塑造地表形态——自然地理综合大考',
+        nodeIds: ['geo_water_cycle', 'geo_ocean', 'geo_landform'],
+        unlockCount: 2, color: '#3498db', xpMultiplier: 2.5, coinMultiplier: 2.5 }
+    ]
+  },
+
+  get BOSSES() {
+    var subj = (App.currentSubject || 'physics');
+    return this.BOSSES_POOL[subj] || this.BOSSES_POOL['physics'];
+  },
 
   // 获取指定Boss的状态
   getStatus: function(boss) {
@@ -98,6 +161,9 @@ App.Boss = {
   _renderQuestion: function() {
     var bs = App.bossState;
     if (!bs || bs.currentIndex >= bs.questions.length) { this._finish(); return; }
+
+    // 重置回答状态，允许新题目正常作答
+    bs._answered = false;
 
     var q = bs.questions[bs.currentIndex];
     document.getElementById('boss-title').textContent = '⚔️ ' + bs.boss.name;

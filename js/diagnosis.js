@@ -270,8 +270,8 @@ App.Diagnosis = {
     return times.reduce(function(a, b) { return a + b; }, 0) / times.length;
   },
 
-  // 记录此次答题时间
-  _recordTimes: function(nodeId, times) {
+  // 记录答题时间（公开方法，供 Practice 等模块调用）
+  recordTimes: function(nodeId, times) {
     var progress = App.userProgress.knowledgeProgress[nodeId];
     if (!progress._times) progress._times = [];
     for (var i = 0; i < times.length; i++) {

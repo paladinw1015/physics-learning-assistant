@@ -1,7 +1,7 @@
 // ===== localStorage 读写封装 =====
 App.Storage = {
 
-  KEY: 'physics_helper_v1',
+  KEY: 'physics_helper_v1',  // 会被 Subject.init() / Subject.switchTo() 动态修改
 
   // 加载进度，返回默认值如果不存在
   load: function() {
@@ -35,6 +35,9 @@ App.Storage = {
   reset: function() {
     if (confirm('确定要重置所有学习数据吗？此操作不可恢复！')) {
       try { localStorage.removeItem(this.KEY); } catch(e) {}
+      // 同时清理考试保存状态
+      try { localStorage.removeItem('physics_exam_state'); } catch(e) {}
+      App.examState = null;
       // 重置为默认（包含所有内部标志位）
       App.userProgress = {
         xp: 0, level: 1, coins: 0, totalCoinsEarned: 0,

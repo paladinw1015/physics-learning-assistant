@@ -3,6 +3,7 @@ App.Ui = {
 
   // ---- 首页仪表盘 ----
   renderDashboard: function() {
+    var cfg = App.Subject.getConfig();
     var xpInfo = App.Gamification.getXpInfo();
     var stats = App.Gamification.getStats();
     document.getElementById('dash-level').textContent = 'Lv.' + xpInfo.level + ' ' + xpInfo.title;
@@ -11,6 +12,14 @@ App.Ui = {
     document.getElementById('dash-coins').textContent = '🪙 ' + App.userProgress.coins;
     document.getElementById('dash-streak').textContent = '🔥 ' + (App.userProgress.streak.current || 0);
     document.getElementById('dash-badges').textContent = '🏅 ' + (App.userProgress.badges.length || 0) + '/' + App.Gamification.BADGES.length;
+
+    // 更新学科相关显示
+    var avatarEl = document.querySelector('#screen-dashboard .avatar');
+    if (avatarEl) avatarEl.textContent = cfg.avatar;
+    var subtitleEl = document.querySelector('#screen-dashboard .dash-subtitle');
+    if (subtitleEl) subtitleEl.textContent = cfg.subtitle;
+    var titleEl = document.querySelector('#screen-dashboard .top-bar-title');
+    if (titleEl) titleEl.textContent = cfg.name + '助手';
 
     // 知识点网格
     var html = '';
@@ -66,12 +75,29 @@ App.Ui = {
     var allNodes = App.knowledgeGraph;
     var nodeIds = Object.keys(allNodes);
 
+    // 空数据兜底
+    if (nodeIds.length === 0) {
+      ctx.fillStyle = '#888';
+      ctx.font = '16px ' + getComputedStyle(document.body).fontFamily;
+      ctx.textAlign = 'center';
+      ctx.fillText('知识图谱数据为空，请刷新页面', cx, cy);
+      console.warn('⚠️ 星图渲染失败：App.knowledgeGraph 为空（当前学科: ' + (App.currentSubject || 'unknown') + '）');
+      return;
+    }
+
     // 映射坐标系统到canvas
     var minX = 60, maxX = 720, minY = 20, maxY = 440;
     var scaleX = (w - 80) / (maxX - minX);
     var scaleY = (h - 60) / (maxY - minY);
     var offsetX = 30;
     var offsetY = 20;
+
+    // ★ 星图标题（当前学科标识）
+    var cfg = App.Subject.getConfig();
+    ctx.fillStyle = 'rgba(255,255,255,0.35)';
+    ctx.font = '11px ' + getComputedStyle(document.body).fontFamily;
+    ctx.textAlign = 'right';
+    ctx.fillText(cfg.name + '知识星图 · ' + nodeIds.length + '节点', w - 20, 18);
 
     var nodePositions = {};
     for (var i = 0; i < nodeIds.length; i++) {

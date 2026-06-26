@@ -23,32 +23,143 @@ App.Gamification = {
 
   XP_PER_LEVEL: [0, 200, 500, 1000, 1800, 3000, 5000, 8000, 12000, 18000, 25000],
 
-  LEVEL_TITLES: [
-    '物理小白', '力学学徒', '运动观察者', '力的掌控者', '运动分析师',
-    '力学达人', '牛顿追随者', '物理解题家', '物理高手', '物理大师', '物理传说'
-  ],
+  // 多学科称号系统
+  LEVEL_TITLES_POOL: {
+    physics: [
+      '物理小白', '力学学徒', '运动观察者', '力的掌控者', '运动分析师',
+      '力学达人', '牛顿追随者', '物理解题家', '物理高手', '物理大师', '物理传说'
+    ],
+    chemistry: [
+      '化学新手', '元素学徒', '反应观察者', '分子操控者', '化学分析师',
+      '化学达人', '拉瓦锡追随者', '化学解题家', '化学高手', '化学大师', '化学传说'
+    ],
+    math: [
+      '数学新手', '代数初学者', '函数探索者', '证明能手', '数学分析师',
+      '数学达人', '欧拉追随者', '数学解题家', '数学高手', '数学大师', '数学传说'
+    ],
+    english: [
+      '英语新手', '单词学徒', '语法掌握者', '口语达人', '英文写作者',
+      '英语达人', '莎士比亚追随者', '英语解题家', '英语高手', '英语大师', '英语传说'
+    ],
+    geography: [
+      '地理新手', '地图学徒', '地质观察者', '气象分析员', '地貌探索者',
+      '地理达人', '徐霞客追随者', '地理解题家', '地理高手', '地理大师', '地理传说'
+    ]
+  },
 
-  BADGES: [
-    { id: 'first_diagnosis', name: '初次诊断', icon: '🔍', desc: '完成第一次知识诊断', condition: 'diagnosisCount >= 1' },
-    { id: 'first_practice', name: '初次练习', icon: '✏️', desc: '完成第一次练习', condition: 'practiceCount >= 1' },
-    { id: 'first_mastery', name: '首个掌握', icon: '⭐', desc: '第一个知识点达到已掌握', condition: 'masteredCount >= 1' },
-    { id: 'streak_3', name: '连续三天', icon: '🔥', desc: '连续学习3天', condition: 'streakBest >= 3' },
-    { id: 'streak_7', name: '周不懈', icon: '💪', desc: '连续学习7天', condition: 'streakBest >= 7' },
-    { id: 'perfect_diag', name: '完美诊断', icon: '💯', desc: '一次诊断全部答对', condition: 'hasPerfectDiag' },
-    { id: 'speed_demon', name: '快如闪电', icon: '⚡', desc: '单题5秒内答对', condition: 'hasSpeedAnswer' },
-    { id: 'speed_improver', name: '提速达人', icon: '🚀', desc: '同知识点答题速度提升20%以上', condition: 'hasSpeedImprove' },
-    { id: 'master_3', name: '小有所成', icon: '🌟', desc: '掌握3个知识点', condition: 'masteredCount >= 3' },
-    { id: 'master_5', name: '知识猎手', icon: '🎯', desc: '掌握5个知识点', condition: 'masteredCount >= 5' },
-    { id: 'master_10', name: '力学之星', icon: '🏆', desc: '掌握10个知识点', condition: 'masteredCount >= 10' },
-    { id: 'coin_100', name: '小有积蓄', icon: '🪙', desc: '累计获得100金币', condition: 'totalCoinsEarned >= 100' },
-    { id: 'level_5', name: '晋升之路', icon: '📈', desc: '达到等级5', condition: 'level >= 5' },
-    { id: 'all_mastered', name: '物理必修一全通', icon: '👑', desc: '全部17个知识点掌握', condition: 'masteredCount >= 17' },
-    { id: 'comeback', name: '卷土重来', icon: '🔄', desc: '薄弱知识点重新诊断后掌握', condition: 'hasComeback' },
-    { id: 'boss_ch1', name: '运动描述之龙', icon: '🌀', desc: '击败第1章Boss', condition: '!!boss1_cleared' },
-    { id: 'boss_ch2', name: '变速魔王', icon: '🚀', desc: '击败第2章Boss', condition: '!!boss2_cleared' },
-    { id: 'boss_ch3', name: '力学武士', icon: '⚔️', desc: '击败第3章Boss', condition: '!!boss3_cleared' },
-    { id: 'boss_ch4', name: '牛顿之果', icon: '🍎', desc: '击败第4章终极Boss', condition: '!!boss4_cleared' }
-  ],
+  get LEVEL_TITLES() {
+    var subj = (App.currentSubject || 'physics');
+    return this.LEVEL_TITLES_POOL[subj] || this.LEVEL_TITLES_POOL['physics'];
+  },
+
+  BADGES_POOL: {
+    physics: [
+      { id: 'first_diagnosis', name: '初次诊断', icon: '🔍', desc: '完成第一次知识诊断', condition: 'diagnosisCount >= 1' },
+      { id: 'first_practice', name: '初次练习', icon: '✏️', desc: '完成第一次练习', condition: 'practiceCount >= 1' },
+      { id: 'first_mastery', name: '首个掌握', icon: '⭐', desc: '第一个知识点达到已掌握', condition: 'masteredCount >= 1' },
+      { id: 'streak_3', name: '连续三天', icon: '🔥', desc: '连续学习3天', condition: 'streakBest >= 3' },
+      { id: 'streak_7', name: '周不懈', icon: '💪', desc: '连续学习7天', condition: 'streakBest >= 7' },
+      { id: 'perfect_diag', name: '完美诊断', icon: '💯', desc: '一次诊断全部答对', condition: 'hasPerfectDiag' },
+      { id: 'speed_demon', name: '快如闪电', icon: '⚡', desc: '单题5秒内答对', condition: 'hasSpeedAnswer' },
+      { id: 'speed_improver', name: '提速达人', icon: '🚀', desc: '同知识点答题速度提升20%以上', condition: 'hasSpeedImprove' },
+      { id: 'master_3', name: '小有所成', icon: '🌟', desc: '掌握3个知识点', condition: 'masteredCount >= 3' },
+      { id: 'master_5', name: '知识猎手', icon: '🎯', desc: '掌握5个知识点', condition: 'masteredCount >= 5' },
+      { id: 'master_10', name: '力学之星', icon: '🏆', desc: '掌握10个知识点', condition: 'masteredCount >= 10' },
+      { id: 'coin_100', name: '小有积蓄', icon: '🪙', desc: '累计获得100金币', condition: 'totalCoinsEarned >= 100' },
+      { id: 'level_5', name: '晋升之路', icon: '📈', desc: '达到等级5', condition: 'level >= 5' },
+      { id: 'all_mastered', name: '物理必修全通', icon: '👑', desc: '全部知识点掌握', condition: 'masteredCount >= 18' },
+      { id: 'comeback', name: '卷土重来', icon: '🔄', desc: '薄弱知识点重新诊断后掌握', condition: 'hasComeback' },
+      { id: 'boss_ch1', name: '运动描述之龙', icon: '🌀', desc: '击败第1章Boss', condition: '!!boss1_cleared' },
+      { id: 'boss_ch2', name: '变速魔王', icon: '🚀', desc: '击败第2章Boss', condition: '!!boss2_cleared' },
+      { id: 'boss_ch3', name: '力学武士', icon: '⚔️', desc: '击败第3章Boss', condition: '!!boss3_cleared' },
+      { id: 'boss_ch4', name: '牛顿之果', icon: '🍎', desc: '击败第4章终极Boss', condition: '!!boss4_cleared' }
+    ],
+    chemistry: [
+      { id: 'first_diagnosis', name: '初次诊断', icon: '🔍', desc: '完成第一次知识诊断', condition: 'diagnosisCount >= 1' },
+      { id: 'first_practice', name: '初次练习', icon: '✏️', desc: '完成第一次练习', condition: 'practiceCount >= 1' },
+      { id: 'first_mastery', name: '首个掌握', icon: '⭐', desc: '第一个知识点达到已掌握', condition: 'masteredCount >= 1' },
+      { id: 'streak_3', name: '连续三天', icon: '🔥', desc: '连续学习3天', condition: 'streakBest >= 3' },
+      { id: 'streak_7', name: '周不懈', icon: '💪', desc: '连续学习7天', condition: 'streakBest >= 7' },
+      { id: 'perfect_diag', name: '完美诊断', icon: '💯', desc: '一次诊断全部答对', condition: 'hasPerfectDiag' },
+      { id: 'speed_demon', name: '快如闪电', icon: '⚡', desc: '单题5秒内答对', condition: 'hasSpeedAnswer' },
+      { id: 'speed_improver', name: '提速达人', icon: '🚀', desc: '同知识点答题速度提升20%以上', condition: 'hasSpeedImprove' },
+      { id: 'master_3', name: '小有所成', icon: '🌟', desc: '掌握3个知识点', condition: 'masteredCount >= 3' },
+      { id: 'master_6', name: '知识猎手', icon: '🎯', desc: '掌握6个知识点', condition: 'masteredCount >= 6' },
+      { id: 'master_10', name: '化学之星', icon: '🏆', desc: '掌握10个知识点', condition: 'masteredCount >= 10' },
+      { id: 'coin_100', name: '小有积蓄', icon: '🪙', desc: '累计获得100金币', condition: 'totalCoinsEarned >= 100' },
+      { id: 'level_5', name: '晋升之路', icon: '📈', desc: '达到等级5', condition: 'level >= 5' },
+      { id: 'all_mastered', name: '化学必修全通', icon: '👑', desc: '全部知识点掌握', condition: 'masteredCount >= 14' },
+      { id: 'comeback', name: '卷土重来', icon: '🔄', desc: '薄弱知识点重新诊断后掌握', condition: 'hasComeback' },
+      { id: 'boss_ch1', name: '物质变化之主', icon: '🧪', desc: '击败第1章Boss', condition: '!!boss1_cleared' },
+      { id: 'boss_ch2', name: '元素掌控者', icon: '⚗️', desc: '击败第2章Boss', condition: '!!boss2_cleared' },
+      { id: 'boss_ch3', name: '周期律大师', icon: '📊', desc: '击败第3章Boss', condition: '!!boss3_cleared' },
+      { id: 'boss_ch4', name: '化学全能王', icon: '👨‍🔬', desc: '击败第4章终极Boss', condition: '!!boss4_cleared' }
+    ],
+    math: [
+      { id: 'first_diagnosis', name: '初次诊断', icon: '🔍', desc: '完成第一次知识诊断', condition: 'diagnosisCount >= 1' },
+      { id: 'first_practice', name: '初次练习', icon: '✏️', desc: '完成第一次练习', condition: 'practiceCount >= 1' },
+      { id: 'first_mastery', name: '首个掌握', icon: '⭐', desc: '第一个知识点达到已掌握', condition: 'masteredCount >= 1' },
+      { id: 'streak_3', name: '连续三天', icon: '🔥', desc: '连续学习3天', condition: 'streakBest >= 3' },
+      { id: 'streak_7', name: '周不懈', icon: '💪', desc: '连续学习7天', condition: 'streakBest >= 7' },
+      { id: 'perfect_diag', name: '完美诊断', icon: '💯', desc: '一次诊断全部答对', condition: 'hasPerfectDiag' },
+      { id: 'speed_demon', name: '快如闪电', icon: '⚡', desc: '单题5秒内答对', condition: 'hasSpeedAnswer' },
+      { id: 'speed_improver', name: '提速达人', icon: '🚀', desc: '同知识点答题速度提升20%以上', condition: 'hasSpeedImprove' },
+      { id: 'master_3', name: '小有所成', icon: '🌟', desc: '掌握3个知识点', condition: 'masteredCount >= 3' },
+      { id: 'master_6', name: '知识猎手', icon: '🎯', desc: '掌握6个知识点', condition: 'masteredCount >= 6' },
+      { id: 'master_9', name: '数学之星', icon: '🏆', desc: '掌握9个知识点', condition: 'masteredCount >= 9' },
+      { id: 'coin_100', name: '小有积蓄', icon: '🪙', desc: '累计获得100金币', condition: 'totalCoinsEarned >= 100' },
+      { id: 'level_5', name: '晋升之路', icon: '📈', desc: '达到等级5', condition: 'level >= 5' },
+      { id: 'all_mastered', name: '数学必修全通', icon: '👑', desc: '全部知识点掌握', condition: 'masteredCount >= 13' },
+      { id: 'comeback', name: '卷土重来', icon: '🔄', desc: '薄弱知识点重新诊断后掌握', condition: 'hasComeback' },
+      { id: 'boss_ch1', name: '函数征服者', icon: '📐', desc: '击败第1章Boss', condition: '!!boss1_cleared' },
+      { id: 'boss_ch2', name: '初等函数专家', icon: '📈', desc: '击败第2章Boss', condition: '!!boss2_cleared' },
+      { id: 'boss_ch3', name: '几何大师', icon: '📏', desc: '击败第3章Boss', condition: '!!boss3_cleared' }
+    ],
+    english: [
+      { id: 'first_diagnosis', name: '初次诊断', icon: '🔍', desc: '完成第一次知识诊断', condition: 'diagnosisCount >= 1' },
+      { id: 'first_practice', name: '初次练习', icon: '✏️', desc: '完成第一次练习', condition: 'practiceCount >= 1' },
+      { id: 'first_mastery', name: '首个掌握', icon: '⭐', desc: '第一个知识点达到已掌握', condition: 'masteredCount >= 1' },
+      { id: 'streak_3', name: '连续三天', icon: '🔥', desc: '连续学习3天', condition: 'streakBest >= 3' },
+      { id: 'streak_7', name: '周不懈', icon: '💪', desc: '连续学习7天', condition: 'streakBest >= 7' },
+      { id: 'perfect_diag', name: '完美诊断', icon: '💯', desc: '一次诊断全部答对', condition: 'hasPerfectDiag' },
+      { id: 'speed_demon', name: '快如闪电', icon: '⚡', desc: '单题5秒内答对', condition: 'hasSpeedAnswer' },
+      { id: 'speed_improver', name: '提速达人', icon: '🚀', desc: '同知识点答题速度提升20%以上', condition: 'hasSpeedImprove' },
+      { id: 'master_3', name: '小有所成', icon: '🌟', desc: '掌握3个知识点', condition: 'masteredCount >= 3' },
+      { id: 'master_6', name: '语法达人', icon: '🎯', desc: '掌握6个知识点', condition: 'masteredCount >= 6' },
+      { id: 'master_9', name: '英语之星', icon: '🏆', desc: '掌握9个知识点', condition: 'masteredCount >= 9' },
+      { id: 'coin_100', name: '小有积蓄', icon: '🪙', desc: '累计获得100金币', condition: 'totalCoinsEarned >= 100' },
+      { id: 'level_5', name: '晋升之路', icon: '📈', desc: '达到等级5', condition: 'level >= 5' },
+      { id: 'all_mastered', name: '语法体系全通', icon: '👑', desc: '全部知识点掌握', condition: 'masteredCount >= 12' },
+      { id: 'comeback', name: '卷土重来', icon: '🔄', desc: '薄弱知识点重新诊断后掌握', condition: 'hasComeback' },
+      { id: 'boss_ch1', name: '时态掌控者', icon: '⏰', desc: '击败第1章Boss', condition: '!!boss1_cleared' },
+      { id: 'boss_ch2', name: '从句大师', icon: '📝', desc: '击败第2章Boss', condition: '!!boss2_cleared' },
+      { id: 'boss_ch3', name: '语法全能王', icon: '📖', desc: '击败第3章Boss', condition: '!!boss3_cleared' }
+    ],
+    geography: [
+      { id: 'first_diagnosis', name: '初次诊断', icon: '🔍', desc: '完成第一次知识诊断', condition: 'diagnosisCount >= 1' },
+      { id: 'first_practice', name: '初次练习', icon: '✏️', desc: '完成第一次练习', condition: 'practiceCount >= 1' },
+      { id: 'first_mastery', name: '首个掌握', icon: '⭐', desc: '第一个知识点达到已掌握', condition: 'masteredCount >= 1' },
+      { id: 'streak_3', name: '连续三天', icon: '🔥', desc: '连续学习3天', condition: 'streakBest >= 3' },
+      { id: 'streak_7', name: '周不懈', icon: '💪', desc: '连续学习7天', condition: 'streakBest >= 7' },
+      { id: 'perfect_diag', name: '完美诊断', icon: '💯', desc: '一次诊断全部答对', condition: 'hasPerfectDiag' },
+      { id: 'speed_demon', name: '快如闪电', icon: '⚡', desc: '单题5秒内答对', condition: 'hasSpeedAnswer' },
+      { id: 'speed_improver', name: '提速达人', icon: '🚀', desc: '同知识点答题速度提升20%以上', condition: 'hasSpeedImprove' },
+      { id: 'master_3', name: '小有所成', icon: '🌟', desc: '掌握3个知识点', condition: 'masteredCount >= 3' },
+      { id: 'master_5', name: '地理达人', icon: '🎯', desc: '掌握5个知识点', condition: 'masteredCount >= 5' },
+      { id: 'master_8', name: '地理之星', icon: '🏆', desc: '掌握8个知识点', condition: 'masteredCount >= 8' },
+      { id: 'coin_100', name: '小有积蓄', icon: '🪙', desc: '累计获得100金币', condition: 'totalCoinsEarned >= 100' },
+      { id: 'level_5', name: '晋升之路', icon: '📈', desc: '达到等级5', condition: 'level >= 5' },
+      { id: 'all_mastered', name: '地理必修全通', icon: '👑', desc: '全部知识点掌握', condition: 'masteredCount >= 10' },
+      { id: 'comeback', name: '卷土重来', icon: '🔄', desc: '薄弱知识点重新诊断后掌握', condition: 'hasComeback' },
+      { id: 'boss_ch1', name: '大气掌控者', icon: '🌤️', desc: '击败第1章Boss', condition: '!!boss1_cleared' },
+      { id: 'boss_ch2', name: '水文专家', icon: '💧', desc: '击败第2章Boss', condition: '!!boss2_cleared' }
+    ]
+  },
+
+  get BADGES() {
+    var subj = (App.currentSubject || 'physics');
+    return this.BADGES_POOL[subj] || this.BADGES_POOL['physics'];
+  },
 
   checkStreak: function() {
     var today = new Date().toISOString().split('T')[0];

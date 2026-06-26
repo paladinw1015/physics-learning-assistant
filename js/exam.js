@@ -47,7 +47,13 @@ App.Exam = {
     if (!App.examState || !App.examState._paused) return;
     App.examState._paused = false;
     App.examState.pausedAt = null;
-    App.examState._answered = false; // 重置答题锁
+    // 只在当前题未答时重置答题锁（防止暂停恢复后重复作答）
+    var es = App.examState;
+    if (es.phase === 'mc' && es.mcAnswers.length <= es.currentMCIndex) {
+      es._answered = false;
+    } else if (es.phase === 'calc' && es.calcAnswers.length <= (es.currentCalcIndex || 0)) {
+      es._answered = false;
+    }
     App.examState.startTime = Date.now() - (this.TIME_LIMIT - App.examState.remainingTime) * 1000;
     App.navigate('exam');
     if (App.examState.phase === 'mc') this._renderMC();
@@ -314,7 +320,7 @@ App.Exam = {
     clearInterval(this._examTimer);
     document.removeEventListener('visibilitychange', this._onVisibility);
     var es = App.examState;
-    if (!es) return;
+    if (!es || es.phase === 'done') return;
 
     es.phase = 'done';
     this.clearSavedExam();

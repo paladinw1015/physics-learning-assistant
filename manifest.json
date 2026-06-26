@@ -1,7 +1,7 @@
 {
-  "name": "高一物理学习小助手",
-  "short_name": "物理助手",
-  "description": "游戏化物理知识点诊断与强化训练",
+  "name": "高中学习助手",
+  "short_name": "学习助手",
+  "description": "游戏化多学科知识点诊断与强化训练——物理、化学",
   "start_url": ".",
   "display": "standalone",
   "orientation": "portrait",
