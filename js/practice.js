@@ -181,8 +181,8 @@ App.Practice = {
     var avgTime = ps.questionTimes.length > 0 ? ps.questionTimes.reduce(function(a, b) { return a + b; }, 0) / total : 0;
     var totalTime = (Date.now() - ps.startTime) / 1000;
 
-    // 记录答题时间
-    App.Diagnosis._recordTimes(nodeId, ps.questionTimes);
+    // 记录答题时间到知识进度
+    App.Diagnosis.recordTimes(nodeId, ps.questionTimes);
 
     // 更新知识进度
     var kp = App.userProgress.knowledgeProgress[nodeId];

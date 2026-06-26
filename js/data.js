@@ -859,6 +859,32 @@ App.knowledgeGraph['g1_force_synthesis'] = {
   ]
 };
 
+// --- g1_torque_balance: 力矩平衡 ---
+App.knowledgeGraph['g1_torque_balance'] = {
+  id: 'g1_torque_balance',
+  name: '力矩与力矩平衡',
+  chapter: '必修一·相互作用',
+  grade: '高一',
+  difficulty: 4,
+  prerequisites: ['g1_force_synthesis', 'g1_gravity_elasticity'],
+  description: '理解力矩的概念(M=F·L)、力臂的确定、力矩平衡条件(ΣM=0)及其在杠杆/滑轮/天平中的应用',
+  position: { x: 480, y: 200 },
+  diagnosticQuestions: [
+    { stem: '力矩的计算公式为？', options: ['M=F·s', 'M=F·L（力×力臂）', 'M=F/a', 'M=F·v'], correct: 1, explanation: '力矩M=F·L，其中L是支点到力作用线的垂直距离（力臂）。单位：N·m。力矩是使物体转动的物理量。', testsPrerequisite: null },
+    { stem: '杠杆平衡条件为？', options: ['F₁+F₂=0', 'F₁·L₁=F₂·L₂', 'F₁/L₁=F₂/L₂', 'F₁=F₂'], correct: 1, explanation: '杠杆平衡条件（力矩平衡）：顺时针力矩=逆时针力矩，即F₁·L₁=F₂·L₂。这是力矩平衡的最简单应用。', testsPrerequisite: null },
+    { stem: '一个均匀杆重20N，长2m，在距一端0.5m处有支点。在较短端加多少力可使杆水平平衡？', options: ['30N', '60N', '10N', '20N'], correct: 0, explanation: '以支点为中心，重心在杆中点（距支点0.5m，在长端一侧）。重力力矩=20×0.5=10N·m(逆时针)。较短端距支点0.5m，需F×0.5=10⇒F=20N。重力使长端下沉。', testsPrerequisite: null },
+    { stem: '力矩平衡条件用公式表示为？', options: ['ΣF=0', 'ΣM=0（合力矩为零）', 'ΣM>0', 'ΣF=ma'], correct: 1, explanation: '物体转动平衡条件：ΣM=0，即所有力对任一支点的力矩代数和为零（规定逆时针为正或顺时针为正）。', testsPrerequisite: null },
+    { stem: '关于力臂的说法，正确的是？', options: ['力臂是支点到力的作用点的距离', '力臂是支点到力作用线的垂直距离', '力臂等于杆长', '力臂与力的大小成正比'], correct: 1, explanation: '力臂是从支点(转轴)到力作用线的垂直距离，不是到作用点的连线距离。画力臂时需作垂线。', testsPrerequisite: null },
+    { stem: '一个2m长的轻质杠杆，支点在一端。在距支点0.5m处挂50N重物。在另一端至少用多大的力才能抬起？', options: ['12.5N', '25N', '50N', '100N'], correct: 0, explanation: '以支点为轴：重力力矩=50×0.5=25N·m(顺时针)。另一端力臂=2m，需F×2=25⇒F=12.5N。省力杠杆。', testsPrerequisite: null }
+  ],
+  practiceQuestions: [
+    { stem: '力矩的单位是？', options: ['N', 'N·m', 'N/m', 'J'], correct: 1, explanation: '力矩M=F·L，单位N·m。与功的单位(J)量纲相同但物理意义不同，一般不用J表示力矩。', difficulty: 2 },
+    { stem: '省力杠杆的特点是？', options: ['动力臂<阻力臂', '动力臂>阻力臂', '动力臂=阻力臂', '与力臂无关'], correct: 1, explanation: '省力杠杆：动力臂>阻力臂→动力<阻力。如撬棍(支点在中间一端)。费力杠杆(如镊子)动力臂<阻力臂。', difficulty: 2 },
+    { stem: '当力通过支点时，力矩为？', options: ['最大', '最小为零', '无法确定', '等于力的大小'], correct: 1, explanation: '力通过支点时力臂为0→M=F×0=0。该力对物体的转动没有影响。', difficulty: 2 },
+    { stem: '天平是利用什么原理？', options: ['牛顿第二定律', '力矩平衡（等臂杠杆）', '动量守恒', '能量守恒'], correct: 1, explanation: '天平是等臂杠杆：两侧力臂相等→平衡时两侧重力相等→质量相等。', difficulty: 2 }
+  ]
+};
+
 // --- g1_newton_first: 牛顿第一定律 ---
 App.knowledgeGraph['g1_newton_first'] = {
   id: 'g1_newton_first',
@@ -1112,8 +1138,20 @@ App.chapterNodes = {
   '初中前置': ['c8_reference_frame', 'c8_speed_concept', 'c8_force_concept', 'c8_friction_basic', 'c9_newton_first_intro'],
   '必修一·运动的描述': ['g1_particle_reference', 'g1_time_displacement', 'g1_velocity_accel'],
   '必修一·匀变速直线运动': ['g1_linear_motion', 'g1_free_fall'],
-  '必修一·相互作用': ['g1_gravity_elasticity', 'g1_friction', 'g1_force_synthesis'],
+  '必修一·相互作用': ['g1_gravity_elasticity', 'g1_friction', 'g1_force_synthesis', 'g1_torque_balance'],
   '必修一·牛顿运动定律': ['g1_newton_first', 'g1_newton_second', 'g1_newton_third', 'g1_newton_application']
 };
 
-console.log('📚 知识图谱加载完成: ' + Object.keys(App.knowledgeGraph).length + ' 个知识点');
+console.log('📚 知识图谱加载完成: ' + Object.keys(App.knowledgeGraph).length + ' 个物理知识点');
+
+// ===== 物理学科数据重载函数（学科切换时调用）=====
+App._loadPhysicsData = function() {
+  // 数据已在 data.js 加载时完成填充，此函数只需确认
+  // 如果 knowledgeGraph 不是物理数据，重新执行 data.js 的初始化逻辑
+  if (!App.knowledgeGraph['g1_newton_application']) {
+    // 物理数据未被加载，需要重新初始化
+    // 由于 data.js 在脚本加载时运行过，数据已经存在
+    // 这里做一次完整性检查
+    console.warn('物理知识图谱不完整，请刷新页面');
+  }
+};

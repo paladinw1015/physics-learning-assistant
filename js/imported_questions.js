@@ -21,7 +21,7 @@ App.questionAnswerKey["imp_ch1-2_1"] = 3;
 // Q2 from ch1-2
 App.importedQuestions["imp_ch1-2_2"] = {
   id: "imp_ch1-2_2",
-  knowledgeId: "unknown",
+  knowledgeId: "g1_time_displacement",
   stem: "下列说法中，正确的是 （ ）",
   options: ["质点做直线运动时，其位移的大小和路程一定相等", "质点做曲线运动时，某段时间内位移的大小一定小于路程", "两个位移相同的质点，它们所通过的路程一定相等", "两个质点通过相同的路程，它们的位移大小一定相等"],
   difficulty: 1
@@ -41,9 +41,9 @@ App.questionAnswerKey["imp_ch1-2_3"] = 1;
 // Q4 from ch1-2
 App.importedQuestions["imp_ch1-2_4"] = {
   id: "imp_ch1-2_4",
-  knowledgeId: "unknown",
+  knowledgeId: "g1_velocity_accel",
   stem: "下列所说的物体的运动情况中，不可能出现的是 （ ）",
-  options: ["物体在某时刻运动速度很大，而加速度为零", "物体在某时刻运动速度很小，而加速度很大", "物体在某时刻运动速度为零，而加速度不为零", "做变速直线运动的物体，加速度方向与速度方向相同，当物体加速度减小时，速"],
+  options: ["物体在某时刻运动速度很大，而加速度为零", "物体在某时刻运动速度很小，而加速度很大", "物体在某时刻运动速度为零，而加速度不为零", "做变速直线运动的物体，加速度方向与速度方向相同，当物体加速度减小时，速度仍在增大"],
   difficulty: 1
 };
 App.questionAnswerKey["imp_ch1-2_4"] = 3;
@@ -81,7 +81,7 @@ App.questionAnswerKey["imp_ch1-2_7"] = 2;
 // Q9 from ch1-2
 App.importedQuestions["imp_ch1-2_9"] = {
   id: "imp_ch1-2_9",
-  knowledgeId: "unknown",
+  knowledgeId: "g1_velocity_accel",
   stem: "甲和乙两个物体在同一直线上运动, 它们的V－t图像分别如图中的a和b所示。下列说法正确的是 [ ]",
   options: ["它们的运动方向相同", "它们的运动方向相反", "在t1时刻甲的速度比乙的速度大", "在t2时刻二者相遇"],
   difficulty: 1
@@ -171,7 +171,7 @@ App.questionAnswerKey["imp_ch1-2_17"] = 0;
 // Q1 from module (重复ID-另一起始)
 App.importedQuestions["imp_module_1"] = {
   id: "imp_module_1",
-  knowledgeId: "unknown",
+  knowledgeId: "g1_gravity_elasticity",
   stem: "第一次通过实验的方法比较准确地测出引力常量的物理学家是（ ）",
   options: ["卡文迪许", "开普勒", "伽利略", "牛顿"],
   difficulty: 1
@@ -193,7 +193,7 @@ App.importedQuestions["imp_module_3"] = {
   id: "imp_module_3",
   knowledgeId: "c8_speed_concept",
   stem: "质量为m的物体从地面上方H高处无初速度释放,落在沙地上出现一个深为h的坑,如图所示,则在整个过程中( )",
-  options: ["重力对物体做功为mgH", "物体的重力势能减少了mg(h+H)", "力对物体做的总功为零", "阻力所做的功为mgh"],
+  options: ["重力对物体做功为mgH", "物体的重力势能减少了mg(h+H)", "外力对物体做的总功为mg(H+h)", "阻力所做的功为mgh"],
   difficulty: 3
 };
 App.questionAnswerKey["imp_module_3"] = 1;
@@ -231,7 +231,7 @@ App.questionAnswerKey["imp_module_6"] = 1;
 // Q7 from module
 App.importedQuestions["imp_module_7"] = {
   id: "imp_module_7",
-  knowledgeId: "unknown",
+  knowledgeId: "g1_gravity_elasticity",
   stem: "同步卫星在赤道上空同步轨道上定位以后，由于受到太阳、月球及其他天体的引力作用而影响，会产生漂移运动而偏离原来的位置，当偏离达到一定程度，就要发动卫星上的小发动机进行修正。图中实线A为同步轨道，若B和C为两个已经偏离轨道但仍在赤道平面内运行的同步卫星，要使它们回到正确的同步轨道上来，应（ ）",
   options: ["开动B的小发动机向前喷气，使B适当减速", "开动B的小发动机向后喷气，使B适当加速", "开动C的小发动机向后喷气，使C适当加速", "开动C的小发动机向前喷气，使C适当减速"],
   difficulty: 2
@@ -251,7 +251,7 @@ App.questionAnswerKey["imp_module_8"] = 2;
 // Q9 from module
 App.importedQuestions["imp_module_9"] = {
   id: "imp_module_9",
-  knowledgeId: "unknown",
+  knowledgeId: "g1_gravity_elasticity",
   stem: "我们研究了开普勒第三定律，知道了行星绕恒星的运动轨道近似是圆形，周期T的平方与轨道半径R的三次方的比为常数，则该常数的大小（ ）",
   options: ["只跟恒星的质量有关", "只跟行星的质量有关", "跟行星、恒星的质量都有关", "跟行星、恒星的质量都没关"],
   difficulty: 2
@@ -274,3 +274,23 @@ App.questionAnswerKey["imp_module_10"] = 1;
   var addedDiag = 0, addedPrac = 0;
   for (var i = 0; i < ids.length; i++) {
     var q = App.importedQuestions[ids[i]];
+    var kp = App.knowledgeGraph[q.knowledgeId];
+    if (!kp) continue;
+    var entry = {
+      stem: q.stem,
+      options: q.options,
+      correct: App.questionAnswerKey[q.id],
+      explanation: '',
+      difficulty: Math.min(q.difficulty + 1, 5)
+    };
+    if (!kp._importedPractice) kp._importedPractice = [];
+    kp._importedPractice.push(entry);
+    addedPrac++;
+    if (entry.difficulty >= 3) {
+      if (!kp._importedDiagnostic) kp._importedDiagnostic = [];
+      kp._importedDiagnostic.push(entry);
+      addedDiag++;
+    }
+  }
+  console.log('📥 导入真题: ' + addedDiag + ' 道进诊断 + ' + addedPrac + ' 道进练习 (共' + ids.length + '道)');
+})();

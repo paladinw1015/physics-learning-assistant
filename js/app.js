@@ -1,6 +1,9 @@
 // ===== 主入口: 初始化 + 页面路由 + 事件绑定 =====
 (function() {
 
+  // --- 学科初始化 ---
+  App.Subject.init();
+
   // --- Screen Navigation ---
   App.navigate = function(screenId) {
     document.querySelectorAll('.screen').forEach(function(s) { s.classList.remove('active'); });
@@ -8,22 +11,21 @@
     if (target) target.classList.add('active');
     App.currentScreen = screenId;
 
-    // Bottom nav
+    // Bottom nav - don't highlight for non-tab screens
+    var tabScreens = ['dashboard', 'starmap', 'badges', 'boss-select', 'shop', 'parent'];
     document.querySelectorAll('#bottom-nav .nav-item').forEach(function(btn) {
-      btn.classList.toggle('active', btn.getAttribute('data-screen') === screenId);
+      btn.classList.toggle('active', btn.getAttribute('data-screen') === screenId && tabScreens.indexOf(screenId) >= 0);
     });
 
     // Trigger render
     if (screenId === 'dashboard') App.Ui.renderDashboard();
     if (screenId === 'starmap') {
       App.Ui.renderStarMap();
-      // Canvas需要延迟重绘（等display生效）
       setTimeout(function() { App.Ui.renderStarMap(); }, 100);
     }
     if (screenId === 'badges') App.Ui.renderBadges();
     if (screenId === 'shop') App.Ui.renderShop();
     if (screenId === 'report') {
-      // 根据来源渲染诊断报告或练习结果
       if (App._lastReport && !App._lastPracticeResult) App.Ui.renderReport();
       else if (App._lastPracticeResult) App.Ui.renderPracticeResult();
     }
@@ -88,7 +90,6 @@
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Backspace' && !this.value && idx > 0) inputs[idx - 1].focus();
     });
-    // Enter key submits
     input.addEventListener('keyup', function(e) {
       if (e.key === 'Enter') App.verifyPin();
     });
@@ -102,7 +103,6 @@
   });
 
   // --- Practice result screen routing ---
-  // Practice result reuses the report screen
   var origNavigate = App.navigate;
   App.navigate = function(screenId) {
     if (screenId === 'practice-result') {
@@ -120,12 +120,25 @@
   };
 
   // --- Init ---
+  // 始终先用物理数据初始化（data.js 已加载）
   App.Storage.load();
   App.Gamification.checkStreak();
   App.Gamification.claimDailyReward();
-  App.Ui.renderDashboard();
 
-  console.log('🚀 高一物理学习小助手 v1.0 已就绪');
+  // 判断是否首次使用
+  var lastSubject = localStorage.getItem('learning_helper_last_subject');
+  if (!lastSubject) {
+    // 首次使用 - 显示学科选择器
+    App.navigate('subject-select');
+  } else if (lastSubject !== 'physics') {
+    // 上次使用了非物理学科 - 加载并切换
+    App.Subject.switchTo(lastSubject);
+  } else {
+    // 上次使用物理，数据已就绪，直接显示仪表盘
+    App.Ui.renderDashboard();
+  }
+
+  console.log('🚀 高中学习助手 v2.0 已就绪 | 当前学科: ' + (App.Subject.getConfig().name));
   console.log('   ' + Object.keys(App.knowledgeGraph).length + ' 个知识点 | ' +
     App.Gamification.BADGES.length + ' 个徽章 | ' +
     App.Gamification.LEVEL_TITLES.length + ' 个等级');
