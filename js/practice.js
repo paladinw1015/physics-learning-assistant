@@ -144,6 +144,14 @@ App.Practice = {
     var ps = App.practiceState;
     if (!ps || ps._answered) return; // 防双击
     ps._answered = true;
+    var q = ps.questions[ps.currentQuestionIndex];
+    if (!q) return;
+    var elapsed = (Date.now() - ps.questionStartTime) / 1000;
+    ps.questionTimes.push(elapsed);
+
+    var isCorrect = (choiceIndex === q.correct);
+    ps.answers.push({ choice: choiceIndex, correct: isCorrect, time: elapsed });
+
     // 难度自适应追踪
     if (ps._consecutiveCorrect === undefined) ps._consecutiveCorrect = 0;
     if (ps._consecutiveWrong === undefined) ps._consecutiveWrong = 0;
@@ -165,13 +173,6 @@ App.Practice = {
       ps._currentDifficulty--;
       ps._consecutiveWrong = 0;
     }
-    var q = ps.questions[ps.currentQuestionIndex];
-    if (!q) return;
-    var elapsed = (Date.now() - ps.questionStartTime) / 1000;
-    ps.questionTimes.push(elapsed);
-
-    var isCorrect = (choiceIndex === q.correct);
-    ps.answers.push({ choice: choiceIndex, correct: isCorrect, time: elapsed });
 
     if (isCorrect) {
       ps.totalCorrect++;
