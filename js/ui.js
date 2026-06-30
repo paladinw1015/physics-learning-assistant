@@ -257,6 +257,11 @@ App.Ui = {
     // emoji
     var allPassed = r.chain.every(function(c) { return c.passed; });
     document.getElementById('report-emoji').textContent = allPassed ? '🎉' : (r.chain.length > 1 ? '🔍' : '📝');
+
+    // 分心报告
+    if (r.focusReport) {
+      document.getElementById('report-focus').innerHTML = this._renderFocusHtml(r.focusReport);
+    }
   },
 
   // ---- 练习结果 ----
@@ -299,6 +304,11 @@ App.Ui = {
         ? '<button class="btn-primary" onclick="App.Practice.start(\'' + pr.nodeId + '\')">🔄 再练一次</button>'
         : '<button class="btn-primary" onclick="App.Diagnosis.start(\'' + pr.nodeId + '\')">✅ 重新诊断</button>';
     document.getElementById('report-start-practice').style.display = 'none';
+
+    // 分心报告
+    if (pr.focusReport) {
+      document.getElementById('report-focus').innerHTML = this._renderFocusHtml(pr.focusReport);
+    }
   },
 
   // ---- 徽章墙 ----
@@ -462,6 +472,11 @@ App.Ui = {
     document.getElementById('boss-time-detail').innerHTML = timeHtml;
 
     document.getElementById('boss-retry-btn').onclick = function() { App.Boss.start(r.boss.id); };
+
+    // 分心报告
+    if (r.focusReport) {
+      document.getElementById('boss-focus').innerHTML = this._renderFocusHtml(r.focusReport);
+    }
   },
 
   // ---- 考试结果 ----
@@ -496,6 +511,11 @@ App.Ui = {
     }
     calcHtml += '</div>';
     document.getElementById('exam-calc-detail').innerHTML = calcHtml;
+
+    // 分心报告
+    if (r.focusReport) {
+      document.getElementById('exam-focus').innerHTML = this._renderFocusHtml(r.focusReport);
+    }
   },
 
   // ---- 道具栏渲染（答题屏共用）----
@@ -517,5 +537,218 @@ App.Ui = {
     }
     html += '</div>';
     container.innerHTML = hasAny || ids.some(function(id){return App.Items.count(id)>0}) ? html : '';
+  },
+
+  // ---- 分心报告渲染 ----
+  _renderFocusHtml: function(focusReport) {
+    if (!focusReport) return '';
+    if (focusReport.count === 0) {
+      return '<div style="text-align:center;margin:12px 0;font-size:13px;color:var(--green)">✅ 全程专注</div>';
+    }
+    var min = Math.floor(focusReport.totalTime / 60);
+    var sec = focusReport.totalTime % 60;
+    var html = '<div style="text-align:center;margin:12px 0;font-size:13px;color:var(--orange)">';
+    html += '📱 切屏 ' + focusReport.count + ' 次，离开 ' + min + '分' + sec + '秒';
+    html += '</div>';
+    return html;
+  },
+
+  // ---- 渲染题号网格 ----
+  renderPalette: function(containerId, total, currentIndex, answers) {
+    var container = document.getElementById(containerId);
+    if (!container) return;
+    var html = '';
+    for (var i = 0; i < total; i++) {
+      var cls = 'palette-dot';
+      if (i === currentIndex) cls += ' current';
+      if (answers && answers[i] !== undefined) {
+        cls += answers[i] ? ' answered-correct' : ' answered-wrong';
+      }
+      html += '<div class="' + cls + '">' + (i + 1) + '</div>';
+    }
+    container.innerHTML = html;
+  },
+
+  // ---- 错题本列表 ----
+  renderWrongBook: function() {
+    var totalWrong = 0;
+    var nodeGroups = [];
+    var ids = Object.keys(App.knowledgeGraph);
+    for (var i = 0; i < ids.length; i++) {
+      var kp = App.userProgress.knowledgeProgress[ids[i]];
+      if (kp && kp._wrongQuestions && kp._wrongQuestions.length > 0) {
+        var node = App.knowledgeGraph[ids[i]];
+        totalWrong += kp._wrongQuestions.length;
+        nodeGroups.push({
+          id: ids[i],
+          name: node.name,
+          chapter: node.chapter,
+          count: kp._wrongQuestions.length
+        });
+      }
+    }
+
+    document.getElementById('wrongbook-count').textContent = totalWrong > 0 ? '共' + totalWrong + '道错题' : '';
+
+    if (nodeGroups.length === 0) {
+      document.getElementById('wrongbook-list').innerHTML =
+        '<div class="empty-state" style="margin-top:60px"><span class="empty-icon">🎉</span><p>暂无错题，继续保持！</p></div>';
+      return;
+    }
+
+    var html = '';
+    for (var i = 0; i < nodeGroups.length; i++) {
+      var g = nodeGroups[i];
+      html += '<div class="card" style="cursor:pointer" onclick="App.Ui.renderWrongBookReview(\'' + g.id + '\')">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between">' +
+        '<div><div style="font-weight:700;font-size:1rem">' + g.name + '</div>' +
+        '<div style="font-size:0.75rem;color:var(--text-secondary)">' + g.chapter + '</div></div>' +
+        '<div style="text-align:right"><div style="font-size:1.5rem;font-weight:800;color:var(--coral)">' + g.count + '</div>' +
+        '<div style="font-size:0.7rem;color:var(--text-secondary)">道错题</div></div></div></div>';
+    }
+    document.getElementById('wrongbook-list').innerHTML = html;
+  },
+
+  // ---- 错题回顾（指定知识点）----
+  renderWrongBookReview: function(nodeId) {
+    var kp = App.userProgress.knowledgeProgress[nodeId];
+    if (!kp || !kp._wrongQuestions || kp._wrongQuestions.length === 0) {
+      App.toast('该知识点暂无错题', 'info');
+      App.Ui.renderWrongBook();
+      return;
+    }
+
+    // 深拷贝错题列表作为回顾题库
+    var questions = [];
+    for (var i = 0; i < kp._wrongQuestions.length; i++) {
+      var wq = kp._wrongQuestions[i];
+      questions.push({
+        stem: wq.stem,
+        options: wq.options.slice(),
+        correct: wq.correct,
+        explanation: wq.explanation || '',
+        _storedIndex: i
+      });
+    }
+
+    var node = App.knowledgeGraph[nodeId];
+    document.getElementById('wrongbook-review-title').textContent = node ? node.name + ' 错题回顾' : '错题回顾';
+
+    App.wrongbookState = {
+      nodeId: nodeId,
+      questions: questions,
+      currentQuestionIndex: 0,
+      answers: [],
+      _answered: false
+    };
+
+    App.navigate('wrongbook-review');
+    this._renderWrongbookQuestion();
+  },
+
+  _renderWrongbookQuestion: function() {
+    var ws = App.wrongbookState;
+    if (!ws) return;
+    var q = ws.questions[ws.currentQuestionIndex];
+    if (!q) { this._finishWrongbookReview(); return; }
+
+    ws._answered = false;
+
+    var total = ws.questions.length;
+    var cur = ws.currentQuestionIndex + 1;
+    document.getElementById('wrongbook-progress-bar').style.width = ((cur - 1) / total * 100) + '%';
+    document.getElementById('wrongbook-progress-text').textContent = '第 ' + cur + ' / ' + total + ' 题';
+    document.getElementById('wrongbook-score-text').textContent = '';
+
+    document.getElementById('wrongbook-stem').textContent = q.stem;
+
+    var labels = ['A', 'B', 'C', 'D'];
+    var html = '';
+    for (var i = 0; i < q.options.length; i++) {
+      html += '<button class="option-btn" onclick="App.Ui.wrongbookAnswer(' + i + ')">' +
+        '<span class="letter-badge">' + labels[i] + '</span>' + q.options[i] + '</button>';
+    }
+    document.getElementById('wrongbook-options').innerHTML = html;
+    document.getElementById('wrongbook-explanation').innerHTML = '';
+
+    // 渲染题号网格
+    var ansArr = [];
+    for (var i = 0; i < ws.answers.length; i++) {
+      ansArr[i] = ws.answers[i].correct;
+    }
+    App.Ui.renderPalette('wrongbook-palette', ws.questions.length, ws.currentQuestionIndex, ansArr);
+  },
+
+  wrongbookAnswer: function(choiceIndex) {
+    var ws = App.wrongbookState;
+    if (!ws || ws._answered) return;
+    ws._answered = true;
+    var q = ws.questions[ws.currentQuestionIndex];
+    if (!q) return;
+
+    var isCorrect = (choiceIndex === q.correct);
+    ws.answers.push({ choice: choiceIndex, correct: isCorrect });
+
+    // 按钮反馈
+    var btns = document.querySelectorAll('#wrongbook-options .option-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].style.pointerEvents = 'none';
+      if (i === q.correct) btns[i].classList.add('correct');
+      if (i === choiceIndex && !isCorrect) btns[i].classList.add('wrong');
+    }
+
+    // 显示解析
+    var expEl = document.getElementById('wrongbook-explanation');
+    if (expEl && q.explanation) {
+      expEl.innerHTML = '<div class="explain-box">' +
+        (isCorrect ? '✅ ' : '❌ ') + '<strong>解析</strong>&nbsp; ' + q.explanation + '</div>';
+    }
+
+    // 更新题号网格
+    var ansArr = [];
+    for (var i = 0; i < ws.answers.length; i++) {
+      ansArr[i] = ws.answers[i].correct;
+    }
+    App.Ui.renderPalette('wrongbook-palette', ws.questions.length, ws.currentQuestionIndex, ansArr);
+
+    // 从错题本移除（如果答对）或更新（如果答错）
+    var kp = App.userProgress.knowledgeProgress[ws.nodeId];
+    if (kp && kp._wrongQuestions) {
+      if (isCorrect) {
+        for (var w = 0; w < kp._wrongQuestions.length; w++) {
+          if (kp._wrongQuestions[w].stem === q.stem) {
+            kp._wrongQuestions.splice(w, 1);
+            App.Storage.save();
+            break;
+          }
+        }
+      } else {
+        for (var w = 0; w < kp._wrongQuestions.length; w++) {
+          if (kp._wrongQuestions[w].stem === q.stem) {
+            kp._wrongQuestions[w].timesWrong++;
+            kp._wrongQuestions[w].userChoice = choiceIndex;
+            kp._wrongQuestions[w].timestamp = Date.now();
+            App.Storage.save();
+            break;
+          }
+        }
+      }
+    }
+
+    var self = this;
+    setTimeout(function() {
+      ws.currentQuestionIndex++;
+      if (ws.currentQuestionIndex >= ws.questions.length) {
+        self._finishWrongbookReview();
+      } else {
+        self._renderWrongbookQuestion();
+      }
+    }, isCorrect ? 500 : 1200);
+  },
+
+  _finishWrongbookReview: function() {
+    App.wrongbookState = null;
+    App.toast('错题回顾完成！', 'success');
+    App.navigate('wrongbook');
   }
 };

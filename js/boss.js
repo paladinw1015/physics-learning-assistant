@@ -140,6 +140,7 @@ App.Boss = {
     }
     var selected = pool.slice(0, Math.min(10, pool.length));
 
+    App.FocusTracker.start();
     App.bossState = {
       boss: boss,
       questions: selected,
@@ -187,6 +188,13 @@ App.Boss = {
     bs.questionStartTime = Date.now();
     this._startTimer();
     App.Items.renderBar('boss-item-bar');
+
+    // 渲染题号网格
+    var ansArr = [];
+    for (var i = 0; i < bs.answers.length; i++) {
+      ansArr[i] = bs.answers[i].correct;
+    }
+    App.Ui.renderPalette('boss-palette', bs.questions.length, bs.currentIndex, ansArr);
   },
 
   _startTimer: function() {
@@ -233,6 +241,54 @@ App.Boss = {
         App.Gamification.addXp(speedBonus);
         bs.xpEarned += speedBonus;
       }
+
+      // 如果此题在错题本中且答对了，移除它
+      var sourceNode = q._sourceNode;
+      if (sourceNode) {
+        var kpCorrect = App.userProgress.knowledgeProgress[sourceNode];
+        if (kpCorrect && kpCorrect._wrongQuestions) {
+          for (var w = 0; w < kpCorrect._wrongQuestions.length; w++) {
+            if (kpCorrect._wrongQuestions[w].stem === q.stem) {
+              kpCorrect._wrongQuestions.splice(w, 1);
+              break;
+            }
+          }
+        }
+      }
+    } else {
+      // 记录错题
+      var sourceNodeWrong = q._sourceNode;
+      if (sourceNodeWrong) {
+        var kpWrong = App.userProgress.knowledgeProgress[sourceNodeWrong];
+        if (kpWrong) {
+          if (!kpWrong._wrongQuestions) kpWrong._wrongQuestions = [];
+          var existing = null;
+          for (var w = 0; w < kpWrong._wrongQuestions.length; w++) {
+            if (kpWrong._wrongQuestions[w].stem === q.stem) {
+              existing = kpWrong._wrongQuestions[w];
+              break;
+            }
+          }
+          if (existing) {
+            existing.timesWrong++;
+            existing.userChoice = choiceIndex;
+            existing.timestamp = Date.now();
+          } else {
+            kpWrong._wrongQuestions.push({
+              stem: q.stem,
+              options: q.options.slice(),
+              correct: q.correct,
+              userChoice: choiceIndex,
+              explanation: q.explanation || '',
+              timestamp: Date.now(),
+              timesWrong: 1
+            });
+          }
+          if (kpWrong._wrongQuestions.length > 50) {
+            kpWrong._wrongQuestions = kpWrong._wrongQuestions.slice(-50);
+          }
+        }
+      }
     }
 
     // 按钮反馈
@@ -251,6 +307,13 @@ App.Boss = {
 
     document.getElementById('boss-progress-bar').style.width = (bs.currentIndex / bs.questions.length * 100) + '%';
     document.getElementById('boss-score-display').textContent = '✅ ' + bs.totalCorrect;
+
+    // 立即更新题号网格
+    var ansArr = [];
+    for (var i = 0; i < bs.answers.length; i++) {
+      ansArr[i] = bs.answers[i].correct;
+    }
+    App.Ui.renderPalette('boss-palette', bs.questions.length, bs.currentIndex, ansArr);
 
     var self = this;
     setTimeout(function() {
@@ -321,6 +384,7 @@ App.Boss = {
     App.Storage.save();
 
     // 存储结果
+    var focus = App.FocusTracker.stop();
     App._lastBossResult = {
       boss: bs.boss,
       score: score,
@@ -332,7 +396,8 @@ App.Boss = {
       xpEarned: bs.xpEarned,
       coinsEarned: bs.coinsEarned,
       questionTimes: bs.questionTimes.slice(),
-      answers: bs.answers.slice()
+      answers: bs.answers.slice(),
+      focusReport: focus
     };
 
     App.bossState = null;

@@ -347,6 +347,26 @@ body {
 }
 .subject-switch-btn:active { box-shadow: var(--inset-sm); transform: scale(0.96); }
 
+/* HUD 题号网格 */
+.palette {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  justify-content: center; margin: 8px 0 12px;
+  padding: 8px; border-radius: var(--r-sm);
+  background: var(--bg); box-shadow: var(--inset-sm);
+}
+.palette-dot {
+  width: 28px; height: 28px; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; cursor: pointer;
+  background: var(--bg); box-shadow: var(--raise-sm);
+  color: var(--text-secondary); transition: all 0.15s ease;
+  border: 2px solid transparent;
+}
+.palette-dot.answered-correct { background: var(--green-bg); color: var(--green); }
+.palette-dot.answered-wrong { background: var(--red-bg); color: var(--red); }
+.palette-dot.current { border-color: var(--accent); box-shadow: 0 0 6px rgba(108,92,231,0.3); }
+.palette-dot.flagged::after { content: '⚑'; font-size: 10px; margin-left: 2px; }
+
 @media (min-width: 768px) {
   .subject-select-grid { grid-template-columns: repeat(3, 1fr); max-width: 600px; margin-left: auto; margin-right: auto; }
   .knowledge-grid { grid-template-columns: repeat(3, 1fr); }
@@ -457,6 +477,7 @@ body {
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" id="diag-progress-bar" style="width:0%"></div></div>
     <div class="progress-label"><span id="diag-progress-text">第 1 / 3 题</span><span id="diag-score-text"></span></div>
+    <div id="diag-palette" class="palette"></div>
     <div class="question-card"><div class="question-stem" id="diag-stem">题目加载中...</div></div>
     <div id="diag-options"></div>
     <div id="diag-explanation" style="margin-top:12px"></div>
@@ -479,6 +500,7 @@ body {
     <div class="weakness-chain" id="report-chain"></div>
     <div class="section-title">建议操作</div>
     <div id="report-recommendation" style="margin-bottom:16px"></div>
+    <div id="report-focus" style="margin-bottom:16px"></div>
     <button class="btn-primary" style="display:block;width:100%;margin-top:12px" id="report-start-practice">开始修复练习</button>
     <button class="btn-secondary" style="margin-top:8px" onclick="App.navigate('starmap')">返回星图</button>
   </div>
@@ -492,6 +514,7 @@ body {
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" id="practice-progress-bar" style="width:0%"></div></div>
     <div class="progress-label"><span id="practice-progress-text">第 1 / 10 题</span><span id="practice-score-text"></span></div>
+    <div id="practice-palette" class="palette"></div>
     <div class="question-card"><div class="question-stem" id="practice-stem">题目加载中...</div></div>
     <div id="practice-options"></div>
     <div id="practice-explanation" style="margin-top:12px"></div>
@@ -523,6 +546,7 @@ body {
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" id="boss-progress-bar" style="width:0%"></div></div>
     <div class="progress-label"><span id="boss-progress-text">第 1 / 10 题</span><span id="boss-score-display"></span></div>
+    <div id="boss-palette" class="palette"></div>
     <div class="question-card"><div class="question-stem" id="boss-stem">加载中...</div></div>
     <div id="boss-options"></div>
     <div id="boss-explanation" style="margin-top:12px"></div>
@@ -539,6 +563,7 @@ body {
     <div class="card" style="text-align:center;margin-bottom:16px" id="boss-result-card"></div>
     <div class="section-title">用时详情</div>
     <div id="boss-time-detail" style="margin-bottom:16px"></div>
+    <div id="boss-focus" style="margin-bottom:16px"></div>
     <button class="btn-primary" style="display:block;width:100%;margin-top:8px" id="boss-retry-btn">再次挑战</button>
     <button class="btn-secondary" style="margin-top:8px" onclick="App.navigate('boss-select')">返回Boss列表</button>
   </div>
@@ -552,6 +577,7 @@ body {
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar-fill" id="exam-progress-bar" style="width:0%"></div></div>
     <div class="progress-label"><span id="exam-phase-text">选择题 1/20</span><span></span></div>
+    <div id="exam-palette" class="palette"></div>
     <div class="question-card"><div class="question-stem" id="exam-stem">加载中...</div></div>
     <div id="exam-options"></div>
     <div id="exam-answer-input" style="display:none"></div>
@@ -570,6 +596,7 @@ body {
     <div id="exam-mc-detail" style="margin-bottom:16px"></div>
     <div class="section-title">计算题详情</div>
     <div id="exam-calc-detail" style="margin-bottom:16px"></div>
+    <div id="exam-focus" style="margin-bottom:16px"></div>
     <button class="btn-primary" style="display:block;width:100%" onclick="App.Exam.clearSavedExam();App.examState=null;App.Exam.start()">🔄 重新考试</button>
     <button class="btn-secondary" style="margin-top:8px" onclick="App.Exam.clearSavedExam();App.examState=null;App.navigate('dashboard')">返回首页</button>
   </div>
@@ -640,6 +667,31 @@ body {
     </div>
   </div>
 
+  <!-- ===== Screen 14: Wrong Book ===== -->
+  <div id="screen-wrongbook" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('dashboard')">←</button>
+      <span class="top-bar-title">错题本</span>
+      <span style="font-size:0.75rem;color:var(--text-secondary)" id="wrongbook-count"></span>
+    </div>
+    <div id="wrongbook-list"></div>
+  </div>
+
+  <!-- ===== Screen 15: Wrong Book Review ===== -->
+  <div id="screen-wrongbook-review" class="screen">
+    <div class="top-bar">
+      <button class="top-bar-back" onclick="App.navigate('wrongbook')">←</button>
+      <span class="top-bar-title" id="wrongbook-review-title">错题回顾</span>
+      <span></span>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="wrongbook-progress-bar" style="width:0%"></div></div>
+    <div class="progress-label"><span id="wrongbook-progress-text">第 1 / X 题</span><span id="wrongbook-score-text"></span></div>
+    <div id="wrongbook-palette" class="palette"></div>
+    <div class="question-card"><div class="question-stem" id="wrongbook-stem">加载中...</div></div>
+    <div id="wrongbook-options"></div>
+    <div id="wrongbook-explanation" style="margin-top:12px"></div>
+  </div>
+
 </div>
 
 <!-- Bottom Navigation -->
@@ -648,6 +700,7 @@ body {
   <button class="nav-item" data-screen="starmap"><span class="nav-icon">◉</span>星图</button>
   <button class="nav-item" data-screen="badges"><span class="nav-icon">☆</span>成就</button>
   <button class="nav-item" data-screen="boss-select"><span class="nav-icon">◆</span>挑战</button>
+  <button class="nav-item" data-screen="wrongbook"><span class="nav-icon">✕</span>错题</button>
   <button class="nav-item" data-screen="shop"><span class="nav-icon">□</span>兑换</button>
   <button class="nav-item" data-screen="parent"><span class="nav-icon">◇</span>家长</button>
 </nav>
@@ -668,6 +721,7 @@ body {
 <script src="js/ui.js"></script>
 <script src="js/subjects/loader.js"></script>
 <script src="js/imported_bundle.js"></script>
+<script src="js/focus-tracker.js"></script>
 <script src="js/app.js"></script>
 <script>
 if ('serviceWorker' in navigator) {

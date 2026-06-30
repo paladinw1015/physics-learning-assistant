@@ -12,10 +12,11 @@ App.Practice = {
       return;
     }
 
+    App.FocusTracker.start();
     App.practiceState = {
       currentNodeId: nodeId,
       currentQuestionIndex: 0,
-      questions: this._pickQuestions(node),
+      questions: this._pickQuestions(node, nodeId),
       answers: [],
       startTime: Date.now(),
       questionStartTime: 0,
@@ -26,7 +27,8 @@ App.Practice = {
       totalCoinsEarned: 0,
       fastAnswers: 0,
       allCorrectSoFar: true,
-      maxStreak: 0
+      maxStreak: 0,
+      _currentDifficulty: 2
     };
 
     App.practiceState.questionStartTime = Date.now();
@@ -35,21 +37,57 @@ App.Practice = {
     this._renderQuestion();
   },
 
-  // 从题库中选题（优先未做过的，混合难度；含导入真题）
-  _pickQuestions: function(node) {
+  // 从题库中选题：错误优先 + 静态题库 + 模板补齐
+  _pickQuestions: function(node, nodeId) {
+    var kp = App.userProgress.knowledgeProgress[nodeId];
+    var wrongQuestions = kp && kp._wrongQuestions ? kp._wrongQuestions : [];
+
+    // Step 1: 从错题本取题（最多 5 道）
+    var fromWrong = [];
+    for (var w = 0; w < wrongQuestions.length && fromWrong.length < 5; w++) {
+      var wq = wrongQuestions[w];
+      fromWrong.push({
+        stem: wq.stem,
+        options: wq.options,
+        correct: wq.correct,
+        explanation: wq.explanation || '',
+        difficulty: 3
+      });
+    }
+
+    // Step 2: 从静态题库取题（最多 8 道，排除错题本已有的）
     var all = node.practiceQuestions ? node.practiceQuestions.slice() : [];
-    // 加入导入的真实试题
     if (node._importedPractice) {
       all = all.concat(node._importedPractice);
     }
-    if (all.length === 0) return [];
-    // 随机打乱
-    for (var i = all.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = all[i]; all[i] = all[j]; all[j] = tmp;
+    // 排除已经在错题中的题
+    var wrongStems = {};
+    for (var w = 0; w < wrongQuestions.length; w++) {
+      wrongStems[wrongQuestions[w].stem] = true;
     }
-    // 取10道（或全部如果不够）
-    return all.slice(0, Math.min(10, all.length));
+    var filtered = [];
+    for (var i = 0; i < all.length; i++) {
+      if (!wrongStems[all[i].stem]) {
+        filtered.push(all[i]);
+      }
+    }
+    // 打乱
+    for (var i = filtered.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = filtered[i]; filtered[i] = filtered[j]; filtered[j] = tmp;
+    }
+    var fromPool = filtered.slice(0, Math.min(8, filtered.length));
+
+    // Step 3: 合并错题 + 静态题
+    var picked = fromWrong.concat(fromPool);
+
+    // Step 4: 如果还不够 10 道，用模板补齐
+    if (picked.length < 10 && App.QuestionTemplates) {
+      var needed = 10 - picked.length;
+      picked = picked.concat(App.QuestionTemplates.generate(nodeId, needed));
+    }
+
+    return picked;
   },
 
   // 渲染题目
@@ -84,6 +122,13 @@ App.Practice = {
     ps.questionStartTime = Date.now();
     this._startTimer();
     App.Items.renderBar('practice-item-bar');
+
+    // 渲染题号网格
+    var ansArr = [];
+    for (var i = 0; i < ps.answers.length; i++) {
+      ansArr[i] = ps.answers[i].correct;
+    }
+    App.Ui.renderPalette('practice-palette', ps.questions.length, ps.currentQuestionIndex, ansArr);
   },
 
   // 计时器
@@ -99,6 +144,27 @@ App.Practice = {
     var ps = App.practiceState;
     if (!ps || ps._answered) return; // 防双击
     ps._answered = true;
+    // 难度自适应追踪
+    if (ps._consecutiveCorrect === undefined) ps._consecutiveCorrect = 0;
+    if (ps._consecutiveWrong === undefined) ps._consecutiveWrong = 0;
+    if (isCorrect) {
+      ps._consecutiveCorrect++;
+      ps._consecutiveWrong = 0;
+    } else {
+      ps._consecutiveWrong++;
+      ps._consecutiveCorrect = 0;
+    }
+    ps._currentDifficulty = ps._currentDifficulty || 2;
+    // 连续 3 道答对 → 提高难度
+    if (ps._consecutiveCorrect >= 3 && ps._currentDifficulty < 5) {
+      ps._currentDifficulty++;
+      ps._consecutiveCorrect = 0;
+    }
+    // 连续 2 道答错 → 降低难度
+    if (ps._consecutiveWrong >= 2 && ps._currentDifficulty > 1) {
+      ps._currentDifficulty--;
+      ps._consecutiveWrong = 0;
+    }
     var q = ps.questions[ps.currentQuestionIndex];
     if (!q) return;
     var elapsed = (Date.now() - ps.questionStartTime) / 1000;
@@ -133,10 +199,52 @@ App.Practice = {
         App.Gamification.addXp(speedBonus);
         ps.totalXpEarned += speedBonus;
       }
+
+      // 如果此题在错题本中且答对了，移除它
+      var kpCorrect = App.userProgress.knowledgeProgress[ps.currentNodeId];
+      if (kpCorrect && kpCorrect._wrongQuestions) {
+        for (var w = 0; w < kpCorrect._wrongQuestions.length; w++) {
+          if (kpCorrect._wrongQuestions[w].stem === q.stem) {
+            kpCorrect._wrongQuestions.splice(w, 1);
+            break;
+          }
+        }
+      }
     } else {
       ps.streakCount = 0;
       ps.allCorrectSoFar = false;
       document.getElementById('practice-streak-count').textContent = '';
+
+      // 记录错题
+      var kpWrong = App.userProgress.knowledgeProgress[ps.currentNodeId];
+      if (kpWrong) {
+        if (!kpWrong._wrongQuestions) kpWrong._wrongQuestions = [];
+        var existing = null;
+        for (var w = 0; w < kpWrong._wrongQuestions.length; w++) {
+          if (kpWrong._wrongQuestions[w].stem === q.stem) {
+            existing = kpWrong._wrongQuestions[w];
+            break;
+          }
+        }
+        if (existing) {
+          existing.timesWrong++;
+          existing.userChoice = choiceIndex;
+          existing.timestamp = Date.now();
+        } else {
+          kpWrong._wrongQuestions.push({
+            stem: q.stem,
+            options: q.options.slice(),
+            correct: q.correct,
+            userChoice: choiceIndex,
+            explanation: q.explanation || '',
+            timestamp: Date.now(),
+            timesWrong: 1
+          });
+        }
+        if (kpWrong._wrongQuestions.length > 50) {
+          kpWrong._wrongQuestions = kpWrong._wrongQuestions.slice(-50);
+        }
+      }
     }
 
     // 按钮反馈
@@ -156,6 +264,13 @@ App.Practice = {
     // 进度条即时更新
     document.getElementById('practice-progress-bar').style.width = (ps.currentQuestionIndex / ps.questions.length * 100) + '%';
     document.getElementById('practice-score-text').textContent = '✅ ' + ps.totalCorrect + ' | ⚡连续' + ps.streakCount;
+
+    // 立即更新题号网格
+    var ansArr = [];
+    for (var i = 0; i < ps.answers.length; i++) {
+      ansArr[i] = ps.answers[i].correct;
+    }
+    App.Ui.renderPalette('practice-palette', ps.questions.length, ps.currentQuestionIndex, ansArr);
 
     var self = this;
     setTimeout(function() {
@@ -224,6 +339,7 @@ App.Practice = {
     }
 
     // 存储练习结果
+    var focus = App.FocusTracker.stop();
     App._lastPracticeResult = {
       nodeId: nodeId,
       nodeName: node.name,
@@ -239,7 +355,8 @@ App.Practice = {
       xpEarned: ps.totalXpEarned,
       coinsEarned: ps.totalCoinsEarned,
       questionTimes: ps.questionTimes.slice(),
-      answers: ps.answers.slice()
+      answers: ps.answers.slice(),
+      focusReport: focus
     };
 
     App.Storage.save();

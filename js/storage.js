@@ -174,7 +174,8 @@ App.Storage = {
           score: 0,
           attempts: 0,
           practiceCompleted: 0,
-          practiceTotal: 0
+          practiceTotal: 0,
+          _wrongQuestions: []
         };
       }
     }

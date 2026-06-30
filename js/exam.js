@@ -22,6 +22,7 @@ App.Exam = {
 
     if (mcQuestions.length < 10) { App.toast('题库不足，请先补充题目', 'error'); return; }
 
+    App.FocusTracker.start();
     App.examState = {
       mcQuestions: mcQuestions,
       calcQuestions: calcQuestions,
@@ -136,6 +137,17 @@ App.Exam = {
 
     es.questionStartTime = Date.now();
     this._startTimer();
+
+    // 渲染题号网格
+    var total = es.mcQuestions.length + es.calcQuestions.length;
+    var ansArr = [];
+    for (var i = 0; i < es.mcAnswers.length; i++) {
+      ansArr[i] = es.mcAnswers[i].correct;
+    }
+    for (var i = 0; i < es.calcAnswers.length; i++) {
+      ansArr[es.mcQuestions.length + i] = es.calcAnswers[i].correct;
+    }
+    App.Ui.renderPalette('exam-palette', total, es.currentMCIndex, ansArr);
   },
 
   answerMC: function(choiceIndex) {
@@ -146,6 +158,53 @@ App.Exam = {
     var q = es.mcQuestions[es.currentMCIndex];
     var isCorrect = (choiceIndex === q.correct);
     es.mcAnswers.push({ choice: choiceIndex, correct: isCorrect });
+
+    // 记录/移除错题
+    var sourceNode = q._sourceNode;
+    if (sourceNode) {
+      var kp = App.userProgress.knowledgeProgress[sourceNode];
+      if (kp) {
+        if (isCorrect) {
+          // 答对了，从错题本移除
+          if (kp._wrongQuestions) {
+            for (var w = 0; w < kp._wrongQuestions.length; w++) {
+              if (kp._wrongQuestions[w].stem === q.stem) {
+                kp._wrongQuestions.splice(w, 1);
+                break;
+              }
+            }
+          }
+        } else {
+          // 答错了，记录错题
+          if (!kp._wrongQuestions) kp._wrongQuestions = [];
+          var existing = null;
+          for (var w = 0; w < kp._wrongQuestions.length; w++) {
+            if (kp._wrongQuestions[w].stem === q.stem) {
+              existing = kp._wrongQuestions[w];
+              break;
+            }
+          }
+          if (existing) {
+            existing.timesWrong++;
+            existing.userChoice = choiceIndex;
+            existing.timestamp = Date.now();
+          } else {
+            kp._wrongQuestions.push({
+              stem: q.stem,
+              options: q.options.slice(),
+              correct: q.correct,
+              userChoice: choiceIndex,
+              explanation: q.explanation || '',
+              timestamp: Date.now(),
+              timesWrong: 1
+            });
+          }
+          if (kp._wrongQuestions.length > 50) {
+            kp._wrongQuestions = kp._wrongQuestions.slice(-50);
+          }
+        }
+      }
+    }
 
     // 按钮反馈
     var btns = document.querySelectorAll('#exam-options .option-btn');
@@ -160,6 +219,14 @@ App.Exam = {
     if (expEl && q.explanation) {
       expEl.innerHTML = '<div class="explain-box">' + (isCorrect ? '✅ ' : '❌ ') + q.explanation + '</div>';
     }
+
+    // 更新题号网格
+    var total = es.mcQuestions.length + es.calcQuestions.length;
+    var ansArr = [];
+    for (var i = 0; i < es.mcAnswers.length; i++) {
+      ansArr[i] = es.mcAnswers[i].correct;
+    }
+    App.Ui.renderPalette('exam-palette', total, es.currentMCIndex, ansArr);
 
     var self = this;
     setTimeout(function() {
@@ -206,6 +273,18 @@ App.Exam = {
 
     es.questionStartTime = Date.now();
     this._startTimer();
+
+    // 渲染题号网格
+    var total = es.mcQuestions.length + es.calcQuestions.length;
+    var ansArr = [];
+    for (var i = 0; i < es.mcAnswers.length; i++) {
+      ansArr[i] = es.mcAnswers[i].correct;
+    }
+    for (var i = 0; i < es.calcAnswers.length; i++) {
+      ansArr[es.mcQuestions.length + i] = es.calcAnswers[i].correct;
+    }
+    var currentIdx = es.mcQuestions.length + (es.currentCalcIndex || 0);
+    App.Ui.renderPalette('exam-palette', total, currentIdx, ansArr);
   },
 
   answerCalc: function(choiceIndex) {
@@ -216,6 +295,51 @@ App.Exam = {
     var q = es.calcQuestions[es.currentCalcIndex];
     var isCorrect = (choiceIndex === q.correct);
     es.calcAnswers.push({ choice: choiceIndex, correct: isCorrect });
+
+    // 记录/移除错题
+    var sourceNode = q._sourceNode;
+    if (sourceNode) {
+      var kp = App.userProgress.knowledgeProgress[sourceNode];
+      if (kp) {
+        if (isCorrect) {
+          if (kp._wrongQuestions) {
+            for (var w = 0; w < kp._wrongQuestions.length; w++) {
+              if (kp._wrongQuestions[w].stem === q.stem) {
+                kp._wrongQuestions.splice(w, 1);
+                break;
+              }
+            }
+          }
+        } else {
+          if (!kp._wrongQuestions) kp._wrongQuestions = [];
+          var existing = null;
+          for (var w = 0; w < kp._wrongQuestions.length; w++) {
+            if (kp._wrongQuestions[w].stem === q.stem) {
+              existing = kp._wrongQuestions[w];
+              break;
+            }
+          }
+          if (existing) {
+            existing.timesWrong++;
+            existing.userChoice = choiceIndex;
+            existing.timestamp = Date.now();
+          } else {
+            kp._wrongQuestions.push({
+              stem: q.stem,
+              options: q.options.slice(),
+              correct: q.correct,
+              userChoice: choiceIndex,
+              explanation: q.explanation || '',
+              timestamp: Date.now(),
+              timesWrong: 1
+            });
+          }
+          if (kp._wrongQuestions.length > 50) {
+            kp._wrongQuestions = kp._wrongQuestions.slice(-50);
+          }
+        }
+      }
+    }
 
     var btns = document.querySelectorAll('#exam-options .option-btn');
     for (var i = 0; i < btns.length; i++) {
@@ -228,6 +352,18 @@ App.Exam = {
     if (expEl && q.explanation) {
       expEl.innerHTML = '<div class="explain-box">' + (isCorrect ? '✅ ' : '❌ ') + q.explanation + '</div>';
     }
+
+    // 更新题号网格
+    var total = es.mcQuestions.length + es.calcQuestions.length;
+    var ansArr = [];
+    for (var i = 0; i < es.mcAnswers.length; i++) {
+      ansArr[i] = es.mcAnswers[i].correct;
+    }
+    for (var i = 0; i < es.calcAnswers.length; i++) {
+      ansArr[es.mcQuestions.length + i] = es.calcAnswers[i].correct;
+    }
+    var currentIdx = es.mcQuestions.length + (es.currentCalcIndex || 0);
+    App.Ui.renderPalette('exam-palette', total, currentIdx, ansArr);
 
     var self = this;
     setTimeout(function() {
@@ -354,6 +490,8 @@ App.Exam = {
     App.Gamification._checkBadges();
     App.Storage.save();
 
+    var focus = App.FocusTracker.stop();
+
     App._lastExamResult = {
       mcCorrect: mcCorrect, mcTotal: es.mcQuestions.length,
       calcCorrect: calcCorrect, calcTotal: es.calcQuestions.length,
@@ -363,7 +501,8 @@ App.Exam = {
       mcAnswers: es.mcAnswers.slice(),
       calcAnswers: es.calcAnswers.slice(),
       mcQuestions: es.mcQuestions.slice(),
-      calcQuestions: es.calcQuestions.slice()
+      calcQuestions: es.calcQuestions.slice(),
+      focusReport: focus
     };
 
     App.navigate('exam-result');

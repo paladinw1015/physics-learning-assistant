@@ -13,6 +13,7 @@ App.Diagnosis = {
     }
 
     // 诊断题随机打乱 + 导入真题
+    App.FocusTracker.start();
     var diagQuestions = node.diagnosticQuestions.slice().concat(node._importedDiagnostic || []);
     for (var i = diagQuestions.length - 1; i > 0; i--) {
       var j = Math.floor(Math.random() * (i + 1));
@@ -80,6 +81,13 @@ App.Diagnosis = {
     ds.questionStartTime = Date.now();
     this._startTimer();
     App.Items.renderBar('diag-item-bar');
+
+    // 渲染题号网格
+    var ansArr = [];
+    for (var i = 0; i < ds.answers.length; i++) {
+      ansArr[i] = ds.answers[i].correct;
+    }
+    App.Ui.renderPalette('diag-palette', ds.questions.length, ds.currentQuestionIndex, ansArr);
   },
 
   // 计时器更新
@@ -106,6 +114,17 @@ App.Diagnosis = {
 
     var isCorrect = (choiceIndex === q.correct);
     ds.answers.push({ choice: choiceIndex, correct: isCorrect, time: elapsed });
+
+    // 难度自适应追踪（诊断模式仅追踪不调整）
+    if (ds._consecutiveCorrect === undefined) ds._consecutiveCorrect = 0;
+    if (ds._consecutiveWrong === undefined) ds._consecutiveWrong = 0;
+    if (isCorrect) {
+      ds._consecutiveCorrect++;
+      ds._consecutiveWrong = 0;
+    } else {
+      ds._consecutiveWrong++;
+      ds._consecutiveCorrect = 0;
+    }
 
     // 禁用按钮
     var btns = document.querySelectorAll('#diag-options .option-btn');
@@ -134,9 +153,58 @@ App.Diagnosis = {
           App.userProgress._hasSpeedAnswer = true;
         }
       }
+
+      // 如果此题在错题本中且答对了，移除它
+      var kpCorrect = App.userProgress.knowledgeProgress[ds.currentNodeId];
+      if (kpCorrect && kpCorrect._wrongQuestions) {
+        for (var w = 0; w < kpCorrect._wrongQuestions.length; w++) {
+          if (kpCorrect._wrongQuestions[w].stem === q.stem) {
+            kpCorrect._wrongQuestions.splice(w, 1);
+            break;
+          }
+        }
+      }
     } else {
       ds.perfectSoFar = false;
+
+      // 记录错题
+      var kpWrong = App.userProgress.knowledgeProgress[ds.currentNodeId];
+      if (kpWrong) {
+        if (!kpWrong._wrongQuestions) kpWrong._wrongQuestions = [];
+        var existing = null;
+        for (var w = 0; w < kpWrong._wrongQuestions.length; w++) {
+          if (kpWrong._wrongQuestions[w].stem === q.stem) {
+            existing = kpWrong._wrongQuestions[w];
+            break;
+          }
+        }
+        if (existing) {
+          existing.timesWrong++;
+          existing.userChoice = choiceIndex;
+          existing.timestamp = Date.now();
+        } else {
+          kpWrong._wrongQuestions.push({
+            stem: q.stem,
+            options: q.options.slice(),
+            correct: q.correct,
+            userChoice: choiceIndex,
+            explanation: q.explanation || '',
+            timestamp: Date.now(),
+            timesWrong: 1
+          });
+        }
+        if (kpWrong._wrongQuestions.length > 50) {
+          kpWrong._wrongQuestions = kpWrong._wrongQuestions.slice(-50);
+        }
+      }
     }
+
+    // 立即更新题号网格
+    var ansArr = [];
+    for (var i = 0; i < ds.answers.length; i++) {
+      ansArr[i] = ds.answers[i].correct;
+    }
+    App.Ui.renderPalette('diag-palette', ds.questions.length, ds.currentQuestionIndex, ansArr);
 
     // 延迟后下一题
     var self = this;
@@ -307,6 +375,7 @@ App.Diagnosis = {
     var ds = App.diagnosisState;
     var totalXpEarned = ds.totalXpEarned;
     var totalCoinsEarned = ds.totalCoinsEarned;
+    var focus = App.FocusTracker.stop();
 
     // 存储报告数据
     App._lastReport = {
@@ -314,7 +383,8 @@ App.Diagnosis = {
       rootNodeId: ds.rootNodeId,
       totalTime: (Date.now() - ds.startTime) / 1000,
       xpEarned: totalXpEarned,
-      coinsEarned: totalCoinsEarned
+      coinsEarned: totalCoinsEarned,
+      focusReport: focus
     };
 
     App.Storage.save();

@@ -12,7 +12,7 @@
     App.currentScreen = screenId;
 
     // Bottom nav - don't highlight for non-tab screens
-    var tabScreens = ['dashboard', 'starmap', 'badges', 'boss-select', 'shop', 'parent'];
+    var tabScreens = ['dashboard', 'starmap', 'badges', 'boss-select', 'shop', 'parent', 'wrongbook'];
     document.querySelectorAll('#bottom-nav .nav-item').forEach(function(btn) {
       btn.classList.toggle('active', btn.getAttribute('data-screen') === screenId && tabScreens.indexOf(screenId) >= 0);
     });
@@ -44,6 +44,7 @@
     if (screenId === 'boss-select') App.Ui.renderBossSelect();
     if (screenId === 'boss-result') App.Ui.renderBossResult();
     if (screenId === 'exam-result') App.Ui.renderExamResult();
+    if (screenId === 'wrongbook') App.Ui.renderWrongBook();
   };
 
   // --- Toast ---
