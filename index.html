@@ -442,6 +442,12 @@ body {
       <div class="stat-card streak"><div class="stat-value" id="dash-streak">0</div><div class="stat-label">连续天数</div></div>
       <div class="stat-card badge"><div class="stat-value" id="dash-badges">0</div><div class="stat-label">徽章</div></div>
     </div>
+    <div class="section-title">数据 / Data</div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <button class="btn-sm" onclick="App.Storage.exportData()" style="flex:1">💾 导出数据</button>
+      <button class="btn-sm" id="import-btn" onclick="document.getElementById('import-file').click()" style="flex:1">📥 导入数据</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="if(this.files[0])App.Storage.importData(this.files[0]);this.value=''">
+    </div>
     <div class="section-title">知识点</div>
     <div class="knowledge-grid" id="dash-knowledge-grid"></div>
     <div style="margin-top:22px">

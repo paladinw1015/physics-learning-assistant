@@ -147,6 +147,124 @@ App.Storage = {
     }
   },
 
+  // ==== 导入导出 ====
+
+  // 导出数据为 JSON
+  exportData: function() {
+    try {
+      var data = JSON.parse(JSON.stringify(App.userProgress));
+      var pin = data.parentPin || '0000';
+      var locked = {};
+      if (data.parentPin) { locked.parentPin = this._xorEncrypt(data.parentPin, pin); }
+      if (data.rewardShop) { locked.rewardShop = this._xorEncrypt(JSON.stringify(data.rewardShop), pin); }
+      if (data.inventory) { locked.inventory = this._xorEncrypt(JSON.stringify(data.inventory), pin); }
+      data._locked = locked;
+      var json = JSON.stringify(data, null, 2);
+      var blob = new Blob([json], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      var subj = App.currentSubject || 'physics';
+      var date = new Date().toISOString().split('T')[0];
+      a.href = url; a.download = 'learning_progress_' + subj + '_' + date + '.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      App.toast('数据已导出', 'success');
+    } catch(e) {
+      App.toast('导出失败', 'error');
+    }
+  },
+
+  // 从文件导入
+  importData: function(file) {
+    var self = this;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var imported = JSON.parse(e.target.result);
+        var locked = imported._locked || {};
+        delete imported._locked;
+        if (locked.parentPin) {
+          var pin = prompt('请输入家长 PIN：');
+          if (pin) {
+            var dec = self._xorEncrypt(locked.parentPin, pin);
+            if (dec === pin) {
+              imported.parentPin = pin;
+              try { imported.rewardShop = JSON.parse(self._xorEncrypt(locked.rewardShop, pin)); } catch(ex) {}
+              try { imported.inventory = JSON.parse(self._xorEncrypt(locked.inventory, pin)); } catch(ex) {}
+              App.toast('学习数据 + 家长设置已恢复', 'success');
+            } else {
+              App.toast('PIN 错误，家长设置未恢复', 'info');
+              imported.parentPin = App.userProgress.parentPin || '0000';
+            }
+          } else {
+            App.toast('仅导入学习数据', 'info');
+            imported.parentPin = App.userProgress.parentPin || '0000';
+          }
+        }
+        self._smartMerge(imported);
+        self.save();
+        App.navigate('dashboard');
+      } catch(ex) {
+        App.toast('导入失败，文件格式错误', 'error');
+      }
+    };
+    reader.readAsText(file);
+  },
+
+  // 智能合并
+  _smartMerge: function(imported) {
+    var cur = App.userProgress;
+    if (imported.xp && imported.xp > cur.xp) cur.xp = imported.xp;
+    if (imported.coins && imported.coins > cur.coins) cur.coins = imported.coins;
+    if (imported.totalCoinsEarned && imported.totalCoinsEarned > cur.totalCoinsEarned) cur.totalCoinsEarned = imported.totalCoinsEarned;
+    if (imported.level && imported.level > cur.level) cur.level = imported.level;
+    if (imported.streak && imported.streak.best > (cur.streak.best || 0)) cur.streak.best = imported.streak.best;
+    if (imported.badges && imported.badges.length) {
+      for (var i = 0; i < imported.badges.length; i++) {
+        if (cur.badges.indexOf(imported.badges[i]) < 0) cur.badges.push(imported.badges[i]);
+      }
+    }
+    if (imported.knowledgeProgress) {
+      this._merge(cur.knowledgeProgress, imported.knowledgeProgress);
+    }
+    if (imported._examCoefficient) {
+      cur._examCoefficient = cur._examCoefficient || {};
+      for (var k in imported._examCoefficient) {
+        cur._examCoefficient[k] = imported._examCoefficient[k] || cur._examCoefficient[k];
+      }
+    }
+    if (imported._examHistory) {
+      cur._examHistory = cur._examHistory || {};
+      for (var k in imported._examHistory) {
+        cur._examHistory[k] = imported._examHistory[k] || cur._examHistory[k];
+      }
+    }
+    if (imported._bossCleared) {
+      cur._bossCleared = cur._bossCleared || [];
+      for (var i = 0; i < imported._bossCleared.length; i++) {
+        if (cur._bossCleared.indexOf(imported._bossCleared[i]) < 0) cur._bossCleared.push(imported._bossCleared[i]);
+      }
+    }
+    if (imported.parentPin && imported.parentPin !== '0000') cur.parentPin = imported.parentPin;
+    if (imported.inventory) {
+      cur.inventory = cur.inventory || {};
+      for (var k in imported.inventory) {
+        cur.inventory[k] = Math.max(cur.inventory[k] || 0, imported.inventory[k] || 0);
+      }
+    }
+  },
+
+  // XOR 加密: text ^ key → base64
+  _xorEncrypt: function(text, key) {
+    var buf = [];
+    for (var i = 0; i < text.length; i++) {
+      buf.push(text.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+    }
+    var bin = '';
+    for (var j = 0; j < buf.length; j++) bin += String.fromCharCode(buf[j]);
+    return btoa(bin);
+  },
+
   // 深合并
   _merge: function(target, source) {
     for (var key in source) {
