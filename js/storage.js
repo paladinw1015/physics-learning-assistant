@@ -133,7 +133,7 @@ App.Storage = {
         _diagnosisCount: 0, _practiceCount: 0,
         _hasPerfectDiag: false, _hasSpeedAnswer: false,
         _hasSpeedImprove: false, _hasComeback: false,
-        _lastDailyClaim: '', _pinChangedOnce: false, _bossCleared: [],
+        _lastDailyClaim: '', _pinChangedOnce: false, _bossCleared: [], _examCoefficient: {}, _examHistory: {},
         inventory: {}
       };
       this._initKnowledgeProgress();
