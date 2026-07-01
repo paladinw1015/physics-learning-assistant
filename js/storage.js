@@ -120,6 +120,10 @@ App.Storage = {
       try { localStorage.removeItem(this.KEY); } catch(e) {}
       // 同时清理考试保存状态和共享数据
       try { localStorage.removeItem('physics_exam_state'); } catch(e) {}
+      var subjects = ['physics', 'chemistry', 'math', 'english', 'geography'];
+      for (var i = 0; i < subjects.length; i++) {
+        try { localStorage.removeItem('exam_state_' + subjects[i]); } catch(e) {}
+      }
       try { localStorage.removeItem(this.SHARED_KEY); } catch(e) {}
       App.examState = null;
       // 重置为默认（包含所有内部标志位）
